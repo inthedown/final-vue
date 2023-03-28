@@ -176,14 +176,14 @@ const form = reactive({
 })
 const uploadMode = param => {}
 const upload = () => {
-
+  var uidList = []
   let fd = new FormData()
   form.fileList.forEach(file => {
     fd.append('fileName', file.raw)
+    uidList.push(file.uid)
   })
 
-  fd.append('info', JSON.stringify(form))
-
+  fd.append('uidList', uidList)
   axios
     .post('/api/file/upload', fd, {
       headers: {

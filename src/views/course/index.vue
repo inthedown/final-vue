@@ -6,32 +6,13 @@
         <el-button type="primary" @click="dialogVisible = true">
           增加课程
         </el-button>
-        <!-- <el-dialog
-          v-model="dialogVisible"
-          title="增加课程"
-          width="80%"
-          append-to-body
-          :before-close="handleClose"
-        >
-          <div>
-            <add-course></add-course>
-          </div>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="dialogVisible = false">取消</el-button>
-              <el-button type="primary" @click="dialogVisible = false">
-                确认
-              </el-button>
-            </span>
-          </template>
-        </el-dialog> -->
       </el-col>
     </el-row>
   </el-header>
   <el-main>
-    <el-scrollbar height="500px">
+    <el-scrollbar height="500px" class="container">
       <p v-for="item in items" :key="item" class="scrollbar-demo-item">
-        {{ item }}
+        <card :data="item"></card>
       </p>
     </el-scrollbar>
   </el-main>
@@ -89,15 +70,17 @@ export default {
 </script>
 
 <style scoped>
-.scrollbar-demo-item {
+.container{
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 150px;
-  margin: 20px;
-  text-align: center;
-  border-radius: 4px;
-  background: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
+            flex-direction: row;
+            flex-wrap: wrap;
+            /* 需要指定高度 */
+            height: 800px;
+            justify-content: center;
+            align-items: flex-start;
+}
+.scrollbar-demo-item {
+width: 25%;
+
 }
 </style>
