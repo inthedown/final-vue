@@ -10,7 +10,7 @@
     </el-row>
   </el-header>
   <el-main>
-    <el-scrollbar height="500px" class="container">
+    <el-scrollbar class="container">
       <p v-for="item in items" :key="item" class="scrollbar-demo-item">
         <card :data="item"></card>
       </p>
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import * as course from "../../api/course"
 import { reactive, toRefs } from 'vue'
 import AddCourse from './addCourse.vue'
 import card from './card.vue'
@@ -27,38 +28,6 @@ export default {
   setup() {
     const state = reactive({
       items: [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
       ],
       dialogVisible: false,
     })
@@ -66,21 +35,34 @@ export default {
       ...toRefs(state),
     }
   },
+  mounted(){
+    var userInfo={
+      "id":1,"role":'student'
+    }
+    course.getList(userInfo).then(res=>{
+      //将数据赋值给items
+      this.items=res.data
+    })
+  }
 }
 </script>
 
 <style scoped>
+
 .container{
+  /* 瀑布流布局 */
   display: flex;
-            flex-direction: row;
+            flex-direction: column;
             flex-wrap: wrap;
             /* 需要指定高度 */
-            height: 800px;
-            justify-content: center;
-            align-items: flex-start;
+            height: 600px;
+
 }
 .scrollbar-demo-item {
-width: 25%;
+  /* 瀑布流卡片样式 */
+width: 90%;
+margin: 0 auto;
+margin-bottom: 20px;
 
 }
 </style>
