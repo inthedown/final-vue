@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import * as course from "../../api/course"
+import * as course from "@/api/Course"
 import { reactive, toRefs } from 'vue'
 import AddCourse from './addCourse.vue'
 import card from './card.vue'

@@ -53,6 +53,7 @@
 <script>
 import { defineComponent, reactive, ref, toRefs } from 'vue'
 import AddView from '../test/UserAdd.vue'
+import * as API from'@/api/user'
 export default defineComponent({
   name: 'userList',
   components: {
@@ -66,15 +67,13 @@ export default defineComponent({
       // 表格列配置，大部分属性跟el-table-column配置一样
       columns: [
         { type: 'selection' },
-        { label: '账户名', prop: 'account' , width: 180},
-        { label: '所属机构', prop: 'mechanism' },
-        { label: '所属角色', prop: 'role' },
-        { label: '状态', prop: 'status'  },
-        { label: '真实姓名', prop: 'realname' },
-        { label: '手机号', prop: 'phonenumber' },
+        { label: '用户名', prop: 'userName' , width: 180},
+        { label: '角色', prop: 'role' },
+        { label: '真实姓名', prop: 'name' },
         { label: '邮箱', prop: 'emale' },
-        { label: '更新时间', prop: 'time' },
-
+        {label:'年级',prop:'grade'},
+        { label: '更新时间', prop: 'createTime' },
+        {label:'信息',prop:'info'},
         {
           label: '操作',
           width: 250,
@@ -89,65 +88,29 @@ export default defineComponent({
         fields: [
           {
             type: 'text',
-            label: '账户名',
-            name: 'nickName',
+            label: '用户名',
+            name: 'userName',
             defaultValue: '',
-          },
-          
-          {
-            label: '状态',
-            name: 'status',
-            type: 'select',
-            defaultValue: 2,
-            options: [
-              {
-                name: '所有',
-                value: 2,
-              },
-              {
-                name: '启用',
-                value: 1,
-              },
-              {
-                name: '停用',
-                value: 0,
-              },
-            ],
-          },
-          
-          {
-            label: '所属机构',
-            name: 'mechanism',
-            type: 'select',
-            defaultValue: 0,
-            options: [
-              {
-                name: '城院罗老师测试',
-                value: 1,
-              },
-              
-              {
-                name: '无',
-                value: 0,
-              },
-            ],
           },
          
           
           {
-            label: '所属角色',
+            label: '角色',
             name: 'role',
             type: 'select',
-            defaultValue: 0,
+            defaultValue: '',
             options: [
-            
               {
-                name: '罗老师',
+                name: '管理员',
                 value: 1,
               },
               {
-                name: '无',
-                value: 0,
+                name: '教师',
+                value: 2,
+              },
+              {
+                name: '学生',
+                value: 3,
               },
             ],
           },
@@ -175,35 +138,9 @@ export default defineComponent({
       async getList(params) {
         console.log(params)
         // params是从组件接收的，包含分页和搜索字段。
-        const { data } = await new Promise(rs => {
-          setTimeout(() => {
-            rs({
-              code: 200,
-              data: {
-                list: [
-                  {
-                    account:'sgh',
-                    mechanism:'城院罗老师测试',
-                    role:'罗老师',
-                    status:'启用',
-                    realname:'sgh',
-                    phonenumber:'15888209766',
-                    emale: '15888209766@163.com',
-                  },
-                  {
-                    account:'nbh',
-                    mechanism:'城院罗老师测试',
-                    role:'罗老师',
-                    status:'启用',
-                    realname:'nbh',
-                    phonenumber:'15888209766',
-                    emale: '15888209766@163.com',
-                  },
-                ],
-                total: 100,
-              },
-            })
-          }, 3000)
+      const {data}=await  API.getList(params).then((res) => {
+          console.log(res)
+          data = res.data
         })
 
         // 必须要返回一个对象，包含data数组和total总数

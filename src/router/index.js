@@ -14,7 +14,7 @@ import course from './modules/course'
 
 /* 菜单栏的路由 */
 // 固定菜单
-export const fixedRoutes = [...home, ...course, ...materialManagement]
+export const fixedRoutes = [...home, ...course, ...materialManagement,...user]
 // 动态菜单
 export const asyncRoutes = []
 

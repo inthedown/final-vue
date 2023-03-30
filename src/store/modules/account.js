@@ -32,6 +32,7 @@ export default {
     async getUserinfo({ commit }) {
       const { code, data } = await GetUserinfo()
       if (+code === 200) {
+        console.log('getUserinfo', data);
         commit('setUserinfo', data)
         return Promise.resolve(data)
       }

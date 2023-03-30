@@ -68,7 +68,7 @@ import {
 import { Login } from '@/api/login'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-
+import {encryptNoKey} from '@/utils/encrypt'
 
 export default defineComponent({
   name: 'login',
@@ -107,7 +107,12 @@ export default defineComponent({
         state.loginForm.validate(async valid => {
           if (valid) {
             state.loading = true
-            const { code, data, message } = await Login(state.model)
+            //加密
+            var model ={... state.model}
+            model.userName = encryptNoKey(model.userName)
+            model.password = encryptNoKey(model.password)
+            const { code, data, message } = await Login(  model, {headers: {from: 'web'}})
+            console.log(code, data, message);
             if (+code === 200) {
               ctx.$message.success({
                 message: '登录成功',
