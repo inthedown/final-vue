@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import * as API from '@/api/material'
+import * as API from '@/api/classes'
 import { defineComponent, ref, getCurrentInstance, reactive, toRefs } from 'vue'
 
 export default defineComponent({
