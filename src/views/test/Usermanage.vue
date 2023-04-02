@@ -251,7 +251,7 @@ export default defineComponent({
     })
     const table = ref(null)
     const refresh = () => {
-      table.current.reload()
+      table.value.refresh()
     }
     const seePwd = async(row) => {
       console.log( row);
