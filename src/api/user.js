@@ -27,3 +27,11 @@ export const seePwd = data => {
 
   })
 }
+export const importStu = data => {
+  return request({
+    url: '/api/user1/importStu/',
+    method: 'post',
+  data: data,
+
+  })
+}

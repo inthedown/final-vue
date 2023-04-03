@@ -25,14 +25,11 @@
       >
         批量删除
       </el-button>
+      <el-button type="info" @click="refresh()">
+        刷新
+      </el-button>
     </template>
-    <template #imgUrl="{row}">
-      <el-image
-        style="width: 100%; height: 100%"
-        :src="row.url"
-        fit="contain"
-      />
-    </template>
+   
     <template #updateTime="{row}">
       {{ parseTime(row.updateTime) }}
     </template>
@@ -56,16 +53,45 @@
       </el-button>
     </template>
   </pro-table>
+  <el-dialog
+    v-model="dialogVisible"
+    width="70%"
+    title="导入班级"
+    :before-close="handleClose"
+  >
+  <el-form :model="form">
+    <el-form-item label="班级名称">
+      <el-input v-model="form.className"></el-input>
+    </el-form-item>
+    <el-form-item style="text-align: center;" >
+      <el-button type="primary" @click="submit">确定</el-button>
+      <el-button type="danger" @click="clearForm">取消</el-button>
+    </el-form-item>
+  </el-form>
+  </el-dialog>
+
+<el-dialog
+    v-model="dialogImportVisible"
+    width="70%"
+    title="导入学生"
+    :before-close="handleClose"
+  >
+  <!-- 子父组件传值 -->
+  <import-stu :id="selectItem.id" :className="selectItem.className"  @close="dialogImportVisible = false"></import-stu>
+  </el-dialog>
 </template>
 
 <script>
 import * as API from '@/api/classes'
-import { defineComponent, ref, getCurrentInstance, reactive, toRefs } from 'vue'
+import { defineComponent, ref, getCurrentInstance, reactive, toRefs } from '@vue/runtime-core'
+import importStu from './importStu.vue'
 
 export default defineComponent({
+  components: { importStu },
   setup() {
     const table = ref(null)
-    const { ctx } = getCurrentInstance()
+
+    const instance = getCurrentInstance()
     const state = reactive({
       columns: [
         {
@@ -107,6 +133,13 @@ export default defineComponent({
         pageSizes: [5, 10, 20, 50],
       },
       selectedPlanIds: [],
+      selectItem: {},
+      dialogVisible: false,
+      dialogImportVisible: false,
+      form: {
+        id: '',
+        className: '',
+      },
     })
     const getClassesList = async params => {
       const { data, total } = await API.getList(params)
@@ -149,16 +182,73 @@ export default defineComponent({
         .catch(() => {})
     }
     const handleSelectionChange = ev => {
-      console.log(ev)
       state.selectedPlanIds = ev.map(item => item.id)
+     state.selectItem = ev[0]
+     console.log('state.selectItem',JSON.stringify(state.selectItem));
     }
+    const addClass = () => {
+      state.dialogVisible = true
+      
+    }
+
+const submit = async () => {
+  var form=state.form
+  console.log(form)
+  const { rspCode } = await API.add(form)
+  if (rspCode === '200') {
+     instance.proxy.$message({
+    message: '创建成功',
+    type: 'success',
+  })
+    state.dialogVisible = false
+    table.value.refresh()
+  } else {
+    instance.proxy.$message({
+    message: '创建失败',
+    type: 'error',
+  })
+  }
+}
+const clearForm = () => {
+  state.dialogVisible = false
+  state.form = {
+    id: '',
+    className: '',
+  }
+}
+const refresh = () => {
+  table.value.refresh()
+}
+const importStu=async ()=>{
+  if(state.selectedPlanIds.length<=0){
+    instance.proxy.$message({
+    message: '请选择班级',
+    type: 'error',
+    })
+    return;
+  }else if(state.selectedPlanIds.length>1){
+    instance.proxy.$message({
+    message: '只能选择一个班级',
+    type: 'error',
+    })
+    return;
+  }
+  state.dialogImportVisible=true
+  //传入子组件
+
+}
     return {
       ...toRefs(state),
       getClassesList,
       parseTime,
       deletePlan,
       table,
+      addClass,
       handleSelectionChange,
+      submit,
+      clearForm,
+      refresh,
+      importStu,
     }
   },
   })

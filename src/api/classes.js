@@ -7,3 +7,10 @@ export const getList = data => {
   })
 }
 
+export const add = data => {
+  return request({
+    url: '/api/classes/add',
+    method: 'post',
+    data: data,
+  })
+}
