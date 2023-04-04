@@ -3,7 +3,7 @@
     <el-row :gutter="20">
       <el-col :span="6">我的课程</el-col>
       <el-col :span="6" :offset="10">
-        <el-button type="primary" @click="dialogVisible = true">
+        <el-button type="primary" @click="addCourse">
           增加课程
         </el-button>
       </el-col>
@@ -20,24 +20,29 @@
 
 <script>
 import * as course from "@/api/Course"
-import { reactive, toRefs } from 'vue'
-import AddCourse from './addCourse.vue'
+import { reactive, toRefs ,getCurrentInstance} from 'vue'
 import card from './card.vue'
 export default {
-  components: { AddCourse ,card},
+  components: {card},
   setup() {
+    const instance = getCurrentInstance()
     const state = reactive({
       items: [
       ],
       dialogVisible: false,
     })
+    const addCourse=()=>{
+      //跳转到增加课程页面
+      instance.proxy.$router.push({path:'/add'})
+    }
     return {
       ...toRefs(state),
+      addCourse
     }
   },
   mounted(){
     var userInfo={
-      "id":1,"role":'student'
+      "id":19,"role":'student'
     }
     course.getList(userInfo).then(res=>{
       //将数据赋值给items

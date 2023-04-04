@@ -1,7 +1,7 @@
 const Layout = () => import('@/layout/index.vue')
 const List = () => import('@/views/test/Usermanage.vue')
 const classList = () => import('@/views/classes/index.vue')
-
+const courseList = () => import('@/views/course/adminIndex.vue')
 
 export default [
   {
@@ -27,6 +27,13 @@ export default [
         component: classList,
         meta: {
           title: '班级管理',
+        },
+      },{
+        path: '/courseManage',
+        name: 'courseList',
+        component: courseList,
+        meta: {
+          title: '课程管理',
         },
       }
 

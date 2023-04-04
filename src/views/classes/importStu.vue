@@ -158,13 +158,14 @@ export default defineComponent({
       },
     });
     const className = ref(props.className);
+    const classId = ref(props.id);
     const table = ref(null);
     const confirm = async () => {
       const ids = state.selectedItems.map((item) => item.id);
-
+    console.log('classId'+classId.value+'className'+className.value);
       const res = await API.importStu({
         stuIds: ids,
-        classId: state.classId,
+        classId: classId.value,
       });
       if (res.rspCode == 200) {
         instance.proxy.$message({
@@ -189,6 +190,7 @@ export default defineComponent({
       table,
       confirm,
       className,
+      classId,
       close,
     };
   },

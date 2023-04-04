@@ -1,437 +1,534 @@
 <template>
   <div id="container"></div>
-  <el-dialog
-    v-model="state.uploadVisible"
-    title="上传素材"
-    width="fit-content"
-    :before-close="handleClose"
-  >
-    <el-upload
-      v-model:file-list="fileList"
-      class="upload-demo"
-      action=""
-      multiple
-      auto-upload="false"
-      :http-request="uploadMode"
-      :on-preview="handlePreview"
-      :on-remove="handleRemove"
-      :on-success="handleSuccess"
-      :before-remove="beforeRemove"
-      :before-upload="beforeUpload"
-      :on-change="handleChange"
-      :on-progress="handleProgress"
-      :on-exceed="handleExceed"
-      :limit="3"
-    >
-      <el-button type="primary">选取</el-button>
-      <template #tip>
-        <div class="el-upload__tip">
-          jpg/png files with a size less than 500KB.
-        </div>
-      </template>
-    </el-upload>
 
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleClose">
-          取消
-        </el-button>
-        <el-button type="primary" @click="uploadFile">
-          确认
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <el-main></el-main>
 </template>
 
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive ,ref,getCurrentInstance} from 'vue'
 import G6 from '@antv/g6'
 import axios from 'axios'
+
+// 声明接收父组件传递的属性
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+})
+const instance = getCurrentInstance()
 const state = reactive({
-  rawData: [],
+  data: props.data,
   uploadVisible: false,
   uploadUrl: '/api/uploadFile',
 })
 onMounted(() => {
-  init()
-})
-const init = () => {
-  const rawData = {
-    label: '程序设计入门——C语言',
-    id: '0',
-    startTime: '',
-    isOpen: 1,
-    children: [
-      {
-        label: '程序设计与C语言',
-        id: '0-1',
-        color: '#5AD8A6',
-        children: [
-          {
-            label: ' 计算机和编程语言',
-            id: '0-1-1',
-            startTime: '2001-03-23',
-            isOpen: 1,
-            children: [
-              {
-                label: 'c语言',
-                id: '0-1-1-1',
-                startTime: '2001-03-25',
-                isOpen: 1,
-                children: [],
-              },
-              {
-                label: '第一个程序',
-                id: '0-1-1-2',
-                startTime: '2001-03-25',
-                isOpen: 1,
-              },
-            ],
-          },
-        ],
-      },
-      {
-        label: '计算',
-        id: '0-2',
-        startTime: '2001-03-23',
-        isOpen: 1,
-        color: '#F6BD16',
-        children: [
-          {
-            label: '变量',
-            id: '0-2-1',
-            children: [],
-          },
-          {
-            label: '数据类型',
-            id: '0-2-2',
-            children: [],
-          },
-          {
-            label: '表达式',
-            id: '0-2-3',
-            children: [],
-          },
-        ],
-      },
-      {
-        label: '判断与循环',
-        id: '0-3',
-        color: '#5AD8A6',
-        children: [
-          {
-            label: '判断',
-            id: '0-3-1',
-            children: [],
-          },
-          {
-            label: '循环',
-            id: '0-3-2',
-            children: [],
-          },
-        ],
-      },
-      {
-        label: '循环控制',
-        id: '0-4',
-        color: '#5AD8A6',
-        children: [
-          {
-            label: '循环控制',
-            id: '0-4-1',
-            children: [],
-          },
-          {
-            label: '多重循环',
-            id: '0-4-2',
-            children: [],
-          },
-          {
-            label: '循环应用',
-            id: '0-4-3',
-            children: [],
-          },
-        ],
-      },
-      {
-        label: '数组与函数',
-        id: '0-5',
-        color: '#5AD8A6',
-        children: [
-          {
-            label: '数组',
-            id: '0-5-1',
-            children: [],
-          },
-          {
-            label: '函数的定义及使用',
-            id: '0-5-2',
-            children: [],
-          },
-          {
-            label: '函数的参数和变量',
-            id: '0-5-3',
-            children: [],
-          },
-          {
-            label: '二维数组',
-            id: '0-5-4',
-            children: [],
-          },
-        ],
-      },
-      {
-        label: '指针与字符串',
-        id: '0-6',
-        color: '#5AD8A6',
-        children: [
-          {
-            label: '指针',
-            id: '0-6-1',
-            children: [],
-          },
-          {
-            label: '字符类型',
-            id: '0-6-2',
-            children: [],
-          },
-          {
-            label: '字符串',
-            id: '0-6-3',
-            children: [],
-          },
-        ],
-      },
-    ],
-  }
-  G6.registerNode('card-node', {
-    draw: function drawShape(cfg, group) {
-      const r = 2
-      const color = '#5B8FF9'
-      const w = cfg.size[0]
-      const h = cfg.size[1]
-      const shape = group.addShape('rect', {
-        attrs: {
-          x: -w / 2,
-          y: -h / 2,
-          width: w, //200,
-          height: h, // 60
-          stroke: color,
-          radius: r,
-          fill: '#fff',
-        },
-        // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-        name: 'main-box',
-        draggable: true,
-      })
 
-      group.addShape('rect', {
-        attrs: {
-          x: -w / 2,
-          y: -h / 2,
-          width: w, //200,
-          height: h / 2, // 60
-          fill: color,
-          radius: [r, r, 0, 0],
-        },
-        // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-        name: 'title-box',
-        draggable: true,
-      })
-
-      // title text
-      group.addShape('text', {
-        attrs: {
-          textBaseline: 'top',
-          x: -w / 2 + 8,
-          y: -h / 2 + 2,
-          lineHeight: 20,
-          text: cfg.id,
-          fill: '#fff',
-        },
-        // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-        name: 'title',
-      })
-      cfg.children &&
-        group.addShape('marker', {
-          attrs: {
-            x: w / 2,
-            y: 0,
-            r: 6,
-            cursor: 'pointer',
-            symbol: cfg.collapsed ? G6.Marker.expand : G6.Marker.collapse,
-            stroke: '#666',
-            lineWidth: 1,
-            fill: '#fff',
-          },
-          // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-          name: 'collapse-icon',
-        })
-      group.addShape('text', {
-        attrs: {
-          textBaseline: 'top',
-          x: -w / 2 + 8,
-          y: -h / 2 + 24,
-          lineHeight: 20,
-          text: 'description',
-          fill: 'rgba(0,0,0, 1)',
-        },
-        // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-        name: `description`,
-      })
-      return shape
-    },
-    setState(name, value, item) {
-      if (name === 'collapsed') {
-        const marker = item
-          .get('group')
-          .find(ele => ele.get('name') === 'collapse-icon')
-        const icon = value ? G6.Marker.expand : G6.Marker.collapse
-        marker.attr('symbol', icon)
-      }
-    },
-  })
-
-  const data = {
-    id: 'A',
-    children: [
-      {
-        id: 'A1',
-        children: [{ id: 'A11' }, { id: 'A12' }, { id: 'A13' }, { id: 'A14' }],
-      },
-      {
-        id: 'A2',
-        children: [
-          {
-            id: 'A21',
-            children: [{ id: 'A211' }, { id: 'A212' }],
-          },
-          {
-            id: 'A22',
-          },
-        ],
-      },
-    ],
+  const colors = {
+    B: '#5B8FF9',
+    R: '#F46649',
+    Y: '#EEBC20',
+    G: '#5BD8A6',
+    DI: '#A7A7A7',
   }
 
+  //  组件props
+  const props = {
+    data: state.data,
+    config: {
+      padding: [10, 20],
+      defaultLevel: 3,
+      defaultZoom: 0.5,
+      modes: { default: ['zoom-canvas', 'drag-canvas', 'drag-node'] },
+    },
+  }
+  //减号
+  const COLLAPSE_ICON = function COLLAPSE_ICON(x, y, r) {
+    return [
+      ['M', x - r, y - r],
+      ['a', r, r, 0, 1, 0, r * 2, 0],
+      ['a', r, r, 0, 1, 0, -r * 2, 0],
+      ['M', x + 2 - r, y - r],
+      ['L', x + r - 2, y - r],
+    ]
+  }
+  //加号
+  const EXPAND_ICON = function EXPAND_ICON(x, y, r) {
+    return [
+      ['M', x - r, y - r],
+      ['a', r, r, 0, 1, 0, r * 2, 0],
+      ['a', r, r, 0, 1, 0, -r * 2, 0],
+      ['M', x + 2 - r, y - r],
+      ['L', x + r - 2, y - r],
+      ['M', x, y - 2 * r + 2],
+      ['L', x, y - 2],
+    ]
+  }
   const container = document.getElementById('container')
   const width = container.scrollWidth
-  const height = container.scrollHeight || 500
+  const height = container.scrollHeight || 600
 
-  const graph = new G6.TreeGraph({
-    container: 'container',
+  // 默认配置
+  const defaultConfig = {
     width,
     height,
     modes: {
-      default: ['drag-canvas'],
+      default: ['zoom-canvas', 'drag-canvas'],
     },
+    fitView: true,
+    animate: true,
     defaultNode: {
-      type: 'card-node',
-      size: [100, 40],
+      type: 'flow-rect',
     },
     defaultEdge: {
       type: 'cubic-horizontal',
       style: {
-        endArrow: true,
+        stroke: '#CED4D9',
       },
     },
     layout: {
       type: 'indented',
       direction: 'LR',
       dropCap: false,
-      indent: 200,
+      indent: 300,
       getHeight: () => {
         return 60
       },
     },
-  })
+  }
 
-  graph.data(data)
-  graph.render()
-  graph.fitView()
-  graph.on('node:click', e => {
-    if (e.target.get('name') === 'collapse-icon') {
-      e.item.getModel().collapsed = !e.item.getModel().collapsed
-      graph.setItemState(e.item, 'collapsed', e.item.getModel().collapsed)
-      graph.layout()
+  // 自定义节点、边
+  const registerFn = () => {
+    /**
+     * 自定义节点
+     */
+    G6.registerNode(
+      'flow-rect',
+      {
+        shapeType: 'flow-rect',
+        draw(cfg, group) {
+          const {
+            name = '',
+            variableName,
+            variableValue,
+            variableUp,
+            label,
+            collapsed,
+            currency,
+            status,
+            rate,
+          } = cfg
+          const grey = '#CED4D9'
+          // 逻辑不应该在这里判断
+          const rectConfig = {
+            width: 202,
+            height: 60,
+            lineWidth: 1,
+            fontSize: 12,
+            fill: '#fff',
+            radius: 4,
+            stroke: grey,
+            opacity: 1,
+          }
+
+          const nodeOrigin = {
+            x: -rectConfig.width / 2,
+            y: -rectConfig.height / 2,
+          }
+
+          const textConfig = {
+            textAlign: 'left',
+            textBaseline: 'bottom',
+          }
+
+          const rect = group.addShape('rect', {
+            attrs: {
+              x: nodeOrigin.x,
+              y: nodeOrigin.y,
+              ...rectConfig,
+            },
+          })
+
+          const rectBBox = rect.getBBox()
+
+          // label title
+          group.addShape('text', {
+            attrs: {
+              ...textConfig,
+              x: 12 + nodeOrigin.x,
+              y: 20 + nodeOrigin.y,
+              text: name.length > 28 ? name.substr(0, 28) + '...' : name,
+              fontSize: 12,
+              opacity: 0.85,
+              fill: '#000',
+              cursor: 'pointer',
+            },
+            name: 'name-shape',
+          })
+
+          // price
+          const price = group.addShape('text', {
+            attrs: {
+              ...textConfig,
+              x: 12 + nodeOrigin.x,
+              y: rectBBox.maxY - 12,
+              text: label,
+              fontSize: 16,
+              fill: '#000',
+              opacity: 0.85,
+            },
+          })
+
+          // label currency
+          group.addShape('text', {
+            attrs: {
+              ...textConfig,
+              x: price.getBBox().maxX + 5,
+              y: rectBBox.maxY - 12,
+              text: currency,
+              fontSize: 12,
+              fill: '#000',
+              opacity: 0.75,
+            },
+          })
+
+          // percentage
+          const percentText = group.addShape('text', {
+            attrs: {
+              ...textConfig,
+              x: rectBBox.maxX - 8,
+              y: rectBBox.maxY - 12,
+              text: `${((variableValue || 0) * 100).toFixed(2)}%`,
+              fontSize: 12,
+              textAlign: 'right',
+              fill: colors[status],
+            },
+          })
+
+          // percentage triangle
+          const symbol = variableUp ? 'triangle' : 'triangle-down'
+          const triangle = group.addShape('marker', {
+            attrs: {
+              ...textConfig,
+              x: percentText.getBBox().minX - 10,
+              y: rectBBox.maxY - 12 - 6,
+              symbol,
+              r: 6,
+              fill: colors[status],
+            },
+          })
+          const triangleAdd = group.addShape('marker', {
+            attrs: {
+              ...textConfig,
+              x: percentText.getBBox().minX + 20,
+              y: rectBBox.maxY + 10,
+              r: 4,
+              stroke: '#73d13d',
+              cursor: 'pointer',
+              symbol: EXPAND_ICON,
+            },
+            name: 'addPoint',
+            modelId: cfg.id,
+          })
+          const triangleDelete = group.addShape('marker', {
+            attrs: {
+              ...textConfig,
+              x: percentText.getBBox().minX + 40,
+              y: rectBBox.maxY + 10,
+              r: 4,
+              stroke: '#ff4d4f',
+              cursor: 'pointer',
+              symbol: COLLAPSE_ICON,
+            },
+            name: 'deletePoint',
+            modelId: cfg.id,
+          })
+          const triangleChange = group.addShape('marker', {
+            attrs: {
+              ...textConfig,
+              x: percentText.getBBox().minX,
+              y: rectBBox.maxY + 6,
+              r: 4,
+              stroke: '#ff4d4f',
+              cursor: 'pointer',
+
+              fill: '#ff4d4f',
+            },
+            name: 'changePoint',
+            modelId: cfg.id,
+          })
+
+          // variable name
+          group.addShape('text', {
+            attrs: {
+              ...textConfig,
+              x: triangle.getBBox().minX - 4,
+              y: rectBBox.maxY - 12,
+              text: variableName,
+              fontSize: 12,
+              textAlign: 'right',
+              fill: '#000',
+              opacity: 0.45,
+            },
+          })
+
+          // bottom line background
+          const bottomBackRect = group.addShape('rect', {
+            attrs: {
+              x: nodeOrigin.x,
+              y: rectBBox.maxY - 4,
+              width: rectConfig.width,
+              height: 4,
+              radius: [0, 0, rectConfig.radius, rectConfig.radius],
+              fill: '#E0DFE3',
+            },
+          })
+
+          // bottom percent
+          const bottomRect = group.addShape('rect', {
+            attrs: {
+              x: nodeOrigin.x,
+              y: rectBBox.maxY - 4,
+              width: rate * rectBBox.width,
+              height: 4,
+              radius: [0, 0, 0, rectConfig.radius],
+              fill: colors[status],
+            },
+          })
+
+          // collapse rect
+          if (cfg.children && cfg.children.length) {
+            group.addShape('rect', {
+              attrs: {
+                x: rectConfig.width / 2 - 8,
+                y: -8,
+                width: 16,
+                height: 16,
+                stroke: 'rgba(0, 0, 0, 0.25)',
+                cursor: 'pointer',
+                fill: '#fff',
+              },
+              name: 'collapse-back',
+              modelId: cfg.id,
+            })
+
+            // collpase text
+            group.addShape('text', {
+              attrs: {
+                x: rectConfig.width / 2,
+                y: -1,
+                textAlign: 'center',
+                textBaseline: 'middle',
+                text: collapsed ? '+' : '-',
+                fontSize: 16,
+                cursor: 'pointer',
+                fill: 'rgba(0, 0, 0, 0.25)',
+              },
+              name: 'collapse-text',
+              modelId: cfg.id,
+            })
+          }
+
+          this.drawLinkPoints(cfg, group)
+          return rect
+        },
+        update(cfg, item) {
+          const group = item.getContainer()
+          this.updateLinkPoints(cfg, group)
+        },
+        setState(name, value, item) {
+          if (name === 'collapse') {
+            const group = item.getContainer()
+            const collapseText = group.find(
+              e => e.get('name') === 'collapse-text'
+            )
+            if (collapseText) {
+              if (!value) {
+                collapseText.attr({
+                  text: '-',
+                })
+              } else {
+                collapseText.attr({
+                  text: '+',
+                })
+              }
+            }
+          }
+        },
+        getAnchorPoints() {
+          return [
+            [0, 0.5],
+            [1, 0.5],
+          ]
+        },
+      },
+      'rect'
+    )
+
+    G6.registerEdge(
+      'flow-cubic',
+      {
+        getControlPoints(cfg) {
+          let controlPoints = cfg.controlPoints // 指定controlPoints
+          if (!controlPoints || !controlPoints.length) {
+            const { startPoint, endPoint, sourceNode, targetNode } = cfg
+            const {
+              x: startX,
+              y: startY,
+              coefficientX,
+              coefficientY,
+            } = sourceNode ? sourceNode.getModel() : startPoint
+            const { x: endX, y: endY } = targetNode
+              ? targetNode.getModel()
+              : endPoint
+            let curveStart = (endX - startX) * coefficientX
+            let curveEnd = (endY - startY) * coefficientY
+            curveStart = curveStart > 40 ? 40 : curveStart
+            curveEnd = curveEnd < -30 ? curveEnd : -30
+            controlPoints = [
+              { x: startPoint.x + curveStart, y: startPoint.y },
+              { x: endPoint.x + curveEnd, y: endPoint.y },
+            ]
+          }
+          return controlPoints
+        },
+        getPath(points) {
+          const path = []
+          path.push(['M', points[0].x, points[0].y])
+          path.push([
+            'C',
+            points[1].x,
+            points[1].y,
+            points[2].x,
+            points[2].y,
+            points[3].x,
+            points[3].y,
+          ])
+          return path
+        },
+      },
+      'single-line'
+    )
+  }
+
+  registerFn()
+
+  const { data } = props
+
+
+  const initGraph = data => {
+    if (!data) {
+      return
     }
-  })
-
-  if (typeof window !== 'undefined')
-    window.onresize = () => {
-      if (!graph || graph.get('destroyed')) return
-      if (!container || !container.scrollWidth || !container.scrollHeight)
-        return
-      graph.changeSize(container.scrollWidth, container.scrollHeight)
-    }
-}
-function uploadFile() {
-  let fd = new FormData()
-  this.fileList.forEach(file => {
-    console.log(file)
-    fd.append('fileName', file.raw)
-  })
-  fd.append('author', 'asd')
-
-  axios
-    .post('api/file/upload', fd, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const { onInit, config } = props
+    const tooltip = new G6.Tooltip({
+      offsetX: 20,
+      offsetY: 30,
+      itemTypes: ['node'],
+      getContent: e => {
+        const outDiv = document.createElement('div')
+        const nodeName = e.item.getModel().name
+        let formatedNodeName = ''
+        for (let i = 0; i < nodeName.length; i++) {
+          formatedNodeName = `${formatedNodeName}${nodeName[i]}`
+          if (i !== 0 && i % 20 === 0)
+            formatedNodeName = `${formatedNodeName}<br/>`
+        }
+        outDiv.innerHTML = `${formatedNodeName}`
+        return outDiv
+      },
+      shouldBegin: e => {
+        if (e.target.get('name') === 'name-shape') return true
+        return false
       },
     })
-    .then(response => {
-      console.log(response.data.rspCode)
-      if (response.data.rspCode === '200') {
-        this.$message({
-          message: '上传成功',
-          type: 'success',
-        })
-        this.uploadVisible = false
-      } else {
-        this.$message({
-          message: '上传失败',
-          type: 'error',
-        })
-      }
-      this.fileList = []
+    let graph = null
+    graph = new G6.TreeGraph({
+      container: 'container',
+      ...defaultConfig,
+      ...config,
+      plugins: [tooltip],
     })
-}
-//关闭弹窗
-function handleClose() {
-  if (state.uploadVisible) {
-    state.uploadVisible = false
+    if (typeof onInit === 'function') {
+      onInit(graph)
+    }
+
+    graph.zoom(config.defaultZoom || 1)
+
+    const handleCollapse = e => {
+      const target = e.target
+      const id = target.get('modelId')
+      const item = graph.findById(id)
+      const nodeModel = item.getModel()
+      // console.log(nodeModel)
+      nodeModel.collapsed = !nodeModel.collapsed
+      graph.layout()
+      graph.setItemState(item, 'collapse', nodeModel.collapsed)
+    }
+    graph.on('collapse-text:click', e => {
+      handleCollapse(e)
+    })
+    graph.on('collapse-back:click', e => {
+      handleCollapse(e)
+      //console.log('click' + JSON.stringify(data))
+    })
+    graph.on('node:click', evt => {
+      const { item, target } = evt
+      const targetType = target.get('type')
+      const name = target.get('name')
+      // 增加元素
+      if (targetType === 'marker') {
+        const model = item.getModel()
+        //console.log(JSON.stringify(model))
+        if (name === 'addPoint') {
+          if (!model.children) {
+            model.children = []
+          }
+          model.children.push({
+            id: model.id + '-' + model.children.length,
+            name: '',
+            label: '',
+            currency: '',
+            date: [],
+            fileList: [],
+            rate: 0,
+            status: 'B',
+            variableName: '未进行',
+            variableValue: 0,
+            variableUp: false,
+          })
+
+          graph.updateChild(model, model.id)
+        } else if (name === 'deletePoint') {
+          graph.removeChild(model.id)
+        } else if (name === 'changePoint') {
+          // console.log(JSON.stringify(model))
+
+          form.id = model.id
+            ? model.id
+            : Math.random()
+                .toString(16)
+                .slice(2)
+          for (var prop in form) {
+            
+            if (form.hasOwnProperty(prop) && model.hasOwnProperty(prop)) {
+              form[prop] = model[prop]
+            }
+          }
+          state.show = true
+        }
+        console.log(JSON.stringify(data));
+        instance.proxy.$emit('childClick', data)
+      }
+    })
+    graph.data(data)
+    graph.render()
+    //graph.fitView()
+    state.graph = graph
   }
-}
-//预览图片
-function handlePreview(file) {
-  this.$preview(file)
-}
-//删除图片
-function handleRemove(file) {
-  this.$message({
-    message: '删除了' + file.name,
-    type: 'success',
-  })
-}
-//上传成功
-function handleSuccess(response, file) {
-  console.log(response)
-  console.log(file)
-  this.$message({
-    message: '上传成功',
-    type: 'success',
-  })
-}
-function handleChange(file, fileList) {
-  console.log(file, fileList)
-  this.fileList = fileList
-  console.log(this.fileList)
-}
-function changeShow() {
-  this.show = !this.show
-}
+
+  initGraph(data)
+})
+
 </script>
 
 <style>

@@ -1,6 +1,7 @@
 const Layout = () => import('@/layout/index.vue')
 const Course = () => import('@/views/course/index.vue')
 const AddCourse =()=>import('@/views/course/addCourse.vue')
+const CourseDteail =()=>import('@/views/course/courseDetail.vue')
 export default [
   {
     path: '/course',
@@ -26,7 +27,16 @@ export default [
         component: AddCourse,
         meta: {
           title: '创建课程',
-          affix: true,
+          affix:false,
+        },
+      },
+      {
+        path: '/detail',
+        name: 'courseDetail',
+        component: CourseDteail,
+        meta: {
+          title: '课程详情',
+          affix:false,
         },
       },
     ],

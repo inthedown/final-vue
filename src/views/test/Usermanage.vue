@@ -241,11 +241,11 @@ export default defineComponent({
         },
         {
           name: '教师',
-          value: 2,
+          value: 3,
         },
         {
           name: '学生',
-          value: 3,
+          value:2,
         },
       ],
     })

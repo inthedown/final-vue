@@ -8,6 +8,13 @@
     :pagination="pagination"
     @selectionChange="handleSelectionChange"
   >
+  <template #courseNum="{ row }">
+      {{row.courses.length}}
+    </template>
+    <template #studentNum="{ row }">
+      {{row.students.length}}
+    </template>
+
     <template #toolbar>
       <el-button type="primary" @click="importStu()">
         导入学生
@@ -35,8 +42,8 @@
     </template>
 
     <template #operate="{row}">
-      <el-button size="mini" @click="preview">
-        预览
+      <el-button size="mini" @click="getDetail(row.id)">
+        详情
       </el-button>
       <el-button
         type="primary"
@@ -104,10 +111,12 @@ export default defineComponent({
         {
           label: '学生人数',
           prop: 'studentNum',
+          tdSlot: 'studentNum',
         },
         {
           label: '课程数量',
-          prop: 'courseName',
+          prop: 'courseNum',
+          tdSlot: 'courseNum',
         },
         {
           label: '操作',
@@ -143,6 +152,7 @@ export default defineComponent({
     })
     const getClassesList = async params => {
       const { data, total } = await API.getList(params)
+
       return {
         data,
         total,
@@ -237,6 +247,11 @@ const importStu=async ()=>{
   //传入子组件
 
 }
+const getDetail = async id => {
+  console.dir(id);
+  const { data } = await API.getDetail({"id":id})
+
+}
     return {
       ...toRefs(state),
       getClassesList,
@@ -249,6 +264,7 @@ const importStu=async ()=>{
       clearForm,
       refresh,
       importStu,
+      getDetail,
     }
   },
   })

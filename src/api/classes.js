@@ -14,3 +14,11 @@ export const add = data => {
     data: data,
   })
 }
+
+export const getDetail = data => {
+  return request({
+    url: '/api/classes/getDetail',
+    method: 'post',
+    params: data,
+  })
+}

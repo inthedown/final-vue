@@ -125,44 +125,44 @@ const state = reactive({
   ],
   message: {
     id: '1',
-    name: '数据结构', //标题
-    label: '12.31', //说明
-    currency: '结束', //日期说明
+    name: '', //标题
+    label: '', //说明
+    currency: '', //日期说明
     fileList: [],
     date: '',
-    rate: 0.341, //图形进度
+    rate: 0, //图形进度
     status: 'B', //进度条颜色
-    variableName: '进行中', //状态
-    variableValue: 0.341, //数字进度
+    variableName: '', //状态
+    variableValue: 0, //数字进度
     variableUp: false, //三角形箭头朝向
-    children: [
-      {
-        id: '11',
-        name: '算法', //标题
-        label: '12.31', //说明
-        fileList: [],
-        date: '',
-        currency: '结束', //说明
-        rate: 0.341, //学习进度
-        status: 'B', //进度条颜色
-        variableName: '进行中', //说明
-        variableValue: 0.341, //说明
-        variableUp: false, //三角形箭头朝向
-      },
-      {
-        id: '12',
-        name: '算法2', //标题
-        label: '12.31', //说明
-        fileList: [],
-        date: '',
-        currency: '结束', //说明
-        rate: 0.341, //学习进度
-        status: 'B', //进度条颜色
-        variableName: '进行中', //说明
-        variableValue: 0.341, //说明
-        variableUp: false, //三角形箭头朝向
-      },
-    ],
+    // children: [
+    //   {
+    //     id: '11',
+    //     name: '算法', //标题
+    //     label: '12.31', //说明
+    //     fileList: [],
+    //     date: '',
+    //     currency: '结束', //说明
+    //     rate: 0.341, //学习进度
+    //     status: 'B', //进度条颜色
+    //     variableName: '进行中', //说明
+    //     variableValue: 0.341, //说明
+    //     variableUp: false, //三角形箭头朝向
+    //   },
+    //   {
+    //     id: '12',
+    //     name: '算法2', //标题
+    //     label: '12.31', //说明
+    //     fileList: [],
+    //     date: '',
+    //     currency: '结束', //说明
+    //     rate: 0.341, //学习进度
+    //     status: 'B', //进度条颜色
+    //     variableName: '进行中', //说明
+    //     variableValue: 0.341, //说明
+    //     variableUp: false, //三角形箭头朝向
+    //   },
+    // ],
   },
 })
 
@@ -795,6 +795,6 @@ onMounted(() => {
 <style>
 #container {
   text-align: center;
-  background-color: azure;
+  background-color: rgb(255, 255, 255);
 }
 </style>
