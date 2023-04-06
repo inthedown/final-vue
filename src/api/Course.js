@@ -26,3 +26,10 @@ export const getDetail = data => {
       params: data,
     })
 }
+export const importCou = data => {
+  return request({
+    url: '/api/course/importCou',
+    method: 'get',
+    params: data,
+  })
+}

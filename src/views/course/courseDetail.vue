@@ -1,43 +1,47 @@
 <template>
-<draw-map :data="data"></draw-map>
+<draw-map :data="id" :teacher="teacher"></draw-map>
 </template>
 
 <script>
-import { reactive, toRefs, getCurrentInstance ,ref} from "vue";
+import { reactive, toRefs, getCurrentInstance, ref, onMounted} from "vue";
+import DrawMap from "@/views/course/drawMap.vue";
 import * as API from "@/api/Course";
 import { useRoute } from 'vue-router'
 export default {
   name: "detail",
-
+  components: {
+    DrawMap,
+  },
   setup() {
      const route = useRoute()
-    const state = ref({
-      data:[],
+    const state = reactive({
+      data:null,
       id:route.query.id,
+      teacher:null,
     });
-
-    return {
-      ...toRefs(state),
-      route,
-    };
-  },
-  mounted() {
+  
+  
+    onMounted(async()=> {
     const route = useRoute()
     const id = route.query.id
      const instance = getCurrentInstance();
-    API.getDetail({"id":id}).then((res) => {
-      console.log(res);
+    const res=await API.getDetail({"id":id})
       if (res.rspCode == '200') {
-        console.log(state);
-         state.value.data = res.data;
+        state.data = res.data; 
+        console.log('state'+JSON.stringify(state.data));   
       } else {
         instance.proxy.$message({
           message: res.errMsg,
           type: "error",
         });
       }
-    });
+  } )
+   return {
+      ...toRefs(state),
+      route
+    }; 
   },
+ 
 };
 </script>
 

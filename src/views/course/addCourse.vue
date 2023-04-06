@@ -82,6 +82,7 @@ const submit = () => {
       type: 'error',
     })
   } else {
+    console.log(state.data);
     const data = {
       name: state.name,
       teacherId: state.teacherId,

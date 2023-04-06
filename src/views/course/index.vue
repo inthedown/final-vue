@@ -10,8 +10,20 @@
     </el-row>
   </el-header>
   <el-main>
-    <el-scrollbar class="container">
-      <p v-for="item in items" :key="item" class="scrollbar-demo-item">
+     <div v-if="items.length==0">
+        <el-alert
+          title="暂无课程"
+          type="info"
+        
+          style=""
+          :closable="false"
+          show-icon>
+        </el-alert>
+      </div>
+    <el-scrollbar v-else class="container">
+     
+
+      <p  v-for="item in items" :key="item" class="scrollbar-demo-item">
         <card :data="item"></card>
       </p>
     </el-scrollbar>

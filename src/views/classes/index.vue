@@ -86,15 +86,19 @@
   <!-- 子父组件传值 -->
   <import-stu :id="selectItem.id" :className="selectItem.className"  @close="dialogImportVisible = false"></import-stu>
   </el-dialog>
+  <el-dialog title="导入课程" v-model="dialogImportCouVisible" :before-close="handleClose">
+    <import-cou :id="selectItem.id" :className="selectItem.className" @close="dialogImportCouVisible = false"></import-cou>
+  </el-dialog>
 </template>
 
 <script>
 import * as API from '@/api/classes'
 import { defineComponent, ref, getCurrentInstance, reactive, toRefs } from '@vue/runtime-core'
+import ImportCou from './importCou.vue'
 import importStu from './importStu.vue'
 
 export default defineComponent({
-  components: { importStu },
+  components: { importStu, ImportCou },
   setup() {
     const table = ref(null)
 
@@ -145,6 +149,7 @@ export default defineComponent({
       selectItem: {},
       dialogVisible: false,
       dialogImportVisible: false,
+      dialogImportCouVisible: false,
       form: {
         id: '',
         className: '',
@@ -247,6 +252,24 @@ const importStu=async ()=>{
   //传入子组件
 
 }
+const importCouse=async ()=>{
+  if(state.selectedPlanIds.length<=0){
+    instance.proxy.$message({
+    message: '请选择班级',
+    type: 'error',
+    })
+    return;
+  }else if(state.selectedPlanIds.length>1){
+    instance.proxy.$message({
+    message: '只能选择一个班级',
+    type: 'error',
+    })
+    return;
+  }
+  state.dialogImportCouVisible=true
+  //传入子组件
+
+}
 const getDetail = async id => {
   console.dir(id);
   const { data } = await API.getDetail({"id":id})
@@ -265,6 +288,7 @@ const getDetail = async id => {
       refresh,
       importStu,
       getDetail,
+      importCouse
     }
   },
   })

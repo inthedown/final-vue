@@ -9,7 +9,7 @@
     @selectionChange="handleSelectionChange"
   >
   <template #teacher="{ row }">
-      {{row.teacher.name}}
+      {{row.teacherName}}
     </template>
   <template #state="{ row }">
         <el-tag v-if="row.state === '未开始'" type="info">未开始</el-tag>
@@ -161,7 +161,8 @@ export default defineComponent({
           }
         });
         data.forEach((item) => {
-          item["sessionNum"] = countSessions(item["sessions"]);
+          item['startTime']=item['startTime'].split('T')[0]
+          item['endTime']=item['endTime'].split('T')[0]
           item['state']=exState(item)
         });
 

@@ -1,100 +1,183 @@
 <template>
   <div id="container"></div>
+  <el-form>
+    <el-form-item label="反馈节点">
+      <el-input v-model="state.select.name" :disabled="true"></el-input>
+      <el-button type="primary" @click="seeFeedback">反馈</el-button>
+    </el-form-item>
+    <el-form-item label="资源列表">
+      <el-table :data="state.resourceList" style="width: 100%">
+        <el-table-column prop="name" label="名称" width="180" key="slot">
+          <!-- 去除文件名后缀 -->
+          <template #default="scope">
+            <span>{{ scope.row.name.split(".")[0] }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="type" label="类型" width="180">
+        </el-table-column>
+        <el-table-column prop="size" label="大小" width="180">
+        </el-table-column>
+        <el-table-column
+          prop="updateTime"
+          label="上传时间"
+          width="180"
+          key="slot"
+        >
+          <!-- 格式化 -->
+          <template #default="scope">
+            <span>{{ scope.row.updateTime.split("T")[0] }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="percentage" label="进度" width="180"
+          ><template slot-scope="scope">
+            <i class="el-icon-time"></i>
+            <span style="margin-left: 10px">{{ scope }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="url" label="浏览" width="180" key="slot">
+          <template #default="scope">
+            <el-link type="primary" :href="scope.row.url" target="_blank"
+              >浏览</el-link
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-form-item>
+  </el-form>
 
+  <el-dialog
+    title="反馈"
+    :visible.sync="dialogVisible"
+    width="width"
+    :before-close="dialogBeforeClose"
+  >
+    <div></div>
+    <div slot="footer">
+      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup>
-import { onMounted, reactive ,ref,getCurrentInstance} from 'vue'
-import G6 from '@antv/g6'
-import axios from 'axios'
-
+import { onMounted, reactive, ref, getCurrentInstance, watch } from "vue";
+import G6 from "@antv/g6";
+import axios from "axios";
+import * as API from "@/api/Course";
 // 声明接收父组件传递的属性
 const props = defineProps({
   data: {
     type: Object,
-    required: true
-  }
-})
-const instance = getCurrentInstance()
+    required: true,
+  },
+});
+const instance = getCurrentInstance();
 const state = reactive({
-  data: props.data,
-  uploadVisible: false,
-  uploadUrl: '/api/uploadFile',
-})
-onMounted(() => {
-
-  const colors = {
-    B: '#5B8FF9',
-    R: '#F46649',
-    Y: '#EEBC20',
-    G: '#5BD8A6',
-    DI: '#A7A7A7',
+  // data: props.data,
+  graph: null,
+  dialogVisible: false,
+  form: [],
+  resourceList: [],
+  select: {},
+});
+const data = ref(props.data);
+const form = ref(null);
+const seeFeedback = async () => {
+  console.log(JSON.stringify(state.select));
+  const res = await API.getFeedBack({ id: select.sid });
+  if (res.rspCode == "200") {
+    state.form = res.data;
+  } else {
+    instance.proxy.$message({
+      message: res.errMsg,
+      type: "error",
+    });
   }
+  state.dialogVisible = true;
+};
+onMounted(async () => {
+  //console.log(props.data)
+  const colors = {
+    B: "#5B8FF9",
+    R: "#F46649",
+    Y: "#EEBC20",
+    G: "#5BD8A6",
+    DI: "#A7A7A7",
+  };
 
+  const res = await API.getDetail({ id: props.data });
+  if (res.rspCode == "200") {
+    state.data = res.data;
+  } else {
+    instance.proxy.$message({
+      message: res.errMsg,
+      type: "error",
+    });
+  }
   //  组件props
-  const props = {
-    data: state.data,
+  const props1 = {
+    data: res.data[0],
     config: {
-      padding: [10, 20],
+      padding: [10, 10],
       defaultLevel: 3,
       defaultZoom: 0.5,
-      modes: { default: ['zoom-canvas', 'drag-canvas', 'drag-node'] },
+      modes: { default: ["zoom-canvas", "drag-canvas"] },
     },
-  }
+  };
   //减号
   const COLLAPSE_ICON = function COLLAPSE_ICON(x, y, r) {
     return [
-      ['M', x - r, y - r],
-      ['a', r, r, 0, 1, 0, r * 2, 0],
-      ['a', r, r, 0, 1, 0, -r * 2, 0],
-      ['M', x + 2 - r, y - r],
-      ['L', x + r - 2, y - r],
-    ]
-  }
+      ["M", x - r, y - r],
+      ["a", r, r, 0, 1, 0, r * 2, 0],
+      ["a", r, r, 0, 1, 0, -r * 2, 0],
+      ["M", x + 2 - r, y - r],
+      ["L", x + r - 2, y - r],
+    ];
+  };
   //加号
   const EXPAND_ICON = function EXPAND_ICON(x, y, r) {
     return [
-      ['M', x - r, y - r],
-      ['a', r, r, 0, 1, 0, r * 2, 0],
-      ['a', r, r, 0, 1, 0, -r * 2, 0],
-      ['M', x + 2 - r, y - r],
-      ['L', x + r - 2, y - r],
-      ['M', x, y - 2 * r + 2],
-      ['L', x, y - 2],
-    ]
-  }
-  const container = document.getElementById('container')
-  const width = container.scrollWidth
-  const height = container.scrollHeight || 600
+      ["M", x - r, y - r],
+      ["a", r, r, 0, 1, 0, r * 2, 0],
+      ["a", r, r, 0, 1, 0, -r * 2, 0],
+      ["M", x + 2 - r, y - r],
+      ["L", x + r - 2, y - r],
+      ["M", x, y - 2 * r + 2],
+      ["L", x, y - 2],
+    ];
+  };
+  const container = document.getElementById("container");
+  const width = container.scrollWidth;
+  const height = container.scrollHeight || 500;
 
   // 默认配置
   const defaultConfig = {
     width,
     height,
     modes: {
-      default: ['zoom-canvas', 'drag-canvas'],
+      default: ["zoom-canvas", "drag-canvas"],
     },
     fitView: true,
     animate: true,
     defaultNode: {
-      type: 'flow-rect',
+      type: "flow-rect",
     },
     defaultEdge: {
-      type: 'cubic-horizontal',
+      type: "cubic-horizontal",
       style: {
-        stroke: '#CED4D9',
+        stroke: "#CED4D9",
       },
     },
     layout: {
-      type: 'indented',
-      direction: 'LR',
+      type: "indented",
+      direction: "LR",
       dropCap: false,
       indent: 300,
       getHeight: () => {
-        return 60
+        return 60;
       },
     },
-  }
+  };
 
   // 自定义节点、边
   const registerFn = () => {
@@ -102,12 +185,12 @@ onMounted(() => {
      * 自定义节点
      */
     G6.registerNode(
-      'flow-rect',
+      "flow-rect",
       {
-        shapeType: 'flow-rect',
+        shapeType: "flow-rect",
         draw(cfg, group) {
           const {
-            name = '',
+            name = "",
             variableName,
             variableValue,
             variableUp,
@@ -116,97 +199,97 @@ onMounted(() => {
             currency,
             status,
             rate,
-          } = cfg
-          const grey = '#CED4D9'
+          } = cfg;
+          const grey = "#CED4D9";
           // 逻辑不应该在这里判断
           const rectConfig = {
             width: 202,
             height: 60,
             lineWidth: 1,
             fontSize: 12,
-            fill: '#fff',
+            fill: "#fff",
             radius: 4,
             stroke: grey,
             opacity: 1,
-          }
+          };
 
           const nodeOrigin = {
             x: -rectConfig.width / 2,
             y: -rectConfig.height / 2,
-          }
+          };
 
           const textConfig = {
-            textAlign: 'left',
-            textBaseline: 'bottom',
-          }
+            textAlign: "left",
+            textBaseline: "bottom",
+          };
 
-          const rect = group.addShape('rect', {
+          const rect = group.addShape("rect", {
             attrs: {
               x: nodeOrigin.x,
               y: nodeOrigin.y,
               ...rectConfig,
             },
-          })
+          });
 
-          const rectBBox = rect.getBBox()
+          const rectBBox = rect.getBBox();
 
           // label title
-          group.addShape('text', {
+          group.addShape("text", {
             attrs: {
               ...textConfig,
               x: 12 + nodeOrigin.x,
               y: 20 + nodeOrigin.y,
-              text: name.length > 28 ? name.substr(0, 28) + '...' : name,
+              text: name.length > 28 ? name.substr(0, 28) + "..." : name,
               fontSize: 12,
               opacity: 0.85,
-              fill: '#000',
-              cursor: 'pointer',
+              fill: "#000",
+              cursor: "pointer",
             },
-            name: 'name-shape',
-          })
+            name: "name-shape",
+          });
 
           // price
-          const price = group.addShape('text', {
+          const price = group.addShape("text", {
             attrs: {
               ...textConfig,
               x: 12 + nodeOrigin.x,
               y: rectBBox.maxY - 12,
               text: label,
               fontSize: 16,
-              fill: '#000',
+              fill: "#000",
               opacity: 0.85,
             },
-          })
+          });
 
           // label currency
-          group.addShape('text', {
+          group.addShape("text", {
             attrs: {
               ...textConfig,
               x: price.getBBox().maxX + 5,
               y: rectBBox.maxY - 12,
               text: currency,
               fontSize: 12,
-              fill: '#000',
+              fill: "#000",
               opacity: 0.75,
             },
-          })
+          });
 
           // percentage
-          const percentText = group.addShape('text', {
+          const percentText = group.addShape("text", {
             attrs: {
               ...textConfig,
               x: rectBBox.maxX - 8,
               y: rectBBox.maxY - 12,
               text: `${((variableValue || 0) * 100).toFixed(2)}%`,
               fontSize: 12,
-              textAlign: 'right',
+              textAlign: "right",
               fill: colors[status],
             },
-          })
+          });
 
           // percentage triangle
-          const symbol = variableUp ? 'triangle' : 'triangle-down'
-          const triangle = group.addShape('marker', {
+          const symbol = variableUp ? "triangle" : "triangle-down";
+          const triangle = group.addShape("marker", {
             attrs: {
               ...textConfig,
               x: percentText.getBBox().minX - 10,
@@ -215,76 +298,76 @@ onMounted(() => {
               r: 6,
               fill: colors[status],
             },
-          })
-          const triangleAdd = group.addShape('marker', {
+          });
+          // const triangleAdd = group.addShape('marker', {
+          //   attrs: {
+          //     ...textConfig,
+          //     x: percentText.getBBox().minX + 20,
+          //     y: rectBBox.maxY + 10,
+          //     r: 4,
+          //     stroke: '#73d13d',
+          //     cursor: 'pointer',
+          //     symbol: EXPAND_ICON,
+          //   },
+          //   name: 'addPoint',
+          //   modelId: cfg.id,
+          // })
+          // const triangleDelete = group.addShape('marker', {
+          //   attrs: {
+          //     ...textConfig,
+          //     x: percentText.getBBox().minX + 40,
+          //     y: rectBBox.maxY + 10,
+          //     r: 4,
+          //     stroke: '#ff4d4f',
+          //     cursor: 'pointer',
+          //     symbol: COLLAPSE_ICON,
+          //   },
+          //   name: 'deletePoint',
+          //   modelId: cfg.id,
+          // })
+          const triangleChange = group.addShape("marker", {
             attrs: {
               ...textConfig,
-              x: percentText.getBBox().minX + 20,
-              y: rectBBox.maxY + 10,
-              r: 4,
-              stroke: '#73d13d',
-              cursor: 'pointer',
-              symbol: EXPAND_ICON,
-            },
-            name: 'addPoint',
-            modelId: cfg.id,
-          })
-          const triangleDelete = group.addShape('marker', {
-            attrs: {
-              ...textConfig,
-              x: percentText.getBBox().minX + 40,
-              y: rectBBox.maxY + 10,
-              r: 4,
-              stroke: '#ff4d4f',
-              cursor: 'pointer',
-              symbol: COLLAPSE_ICON,
-            },
-            name: 'deletePoint',
-            modelId: cfg.id,
-          })
-          const triangleChange = group.addShape('marker', {
-            attrs: {
-              ...textConfig,
-              x: percentText.getBBox().minX,
+              x: percentText.getBBox().minX + 30,
               y: rectBBox.maxY + 6,
               r: 4,
-              stroke: '#ff4d4f',
-              cursor: 'pointer',
+              stroke: "#ff4d4f",
+              cursor: "pointer",
 
-              fill: '#ff4d4f',
+              fill: "#ff4d4f",
             },
-            name: 'changePoint',
+            name: "changePoint",
             modelId: cfg.id,
-          })
+          });
 
           // variable name
-          group.addShape('text', {
+          group.addShape("text", {
             attrs: {
               ...textConfig,
               x: triangle.getBBox().minX - 4,
               y: rectBBox.maxY - 12,
               text: variableName,
               fontSize: 12,
-              textAlign: 'right',
-              fill: '#000',
+              textAlign: "right",
+              fill: "#000",
               opacity: 0.45,
             },
-          })
+          });
 
           // bottom line background
-          const bottomBackRect = group.addShape('rect', {
+          const bottomBackRect = group.addShape("rect", {
             attrs: {
               x: nodeOrigin.x,
               y: rectBBox.maxY - 4,
               width: rectConfig.width,
               height: 4,
               radius: [0, 0, rectConfig.radius, rectConfig.radius],
-              fill: '#E0DFE3',
+              fill: "#E0DFE3",
             },
-          })
+          });
 
           // bottom percent
-          const bottomRect = group.addShape('rect', {
+          const bottomRect = group.addShape("rect", {
             attrs: {
               x: nodeOrigin.x,
               y: rectBBox.maxY - 4,
@@ -293,63 +376,63 @@ onMounted(() => {
               radius: [0, 0, 0, rectConfig.radius],
               fill: colors[status],
             },
-          })
+          });
 
           // collapse rect
           if (cfg.children && cfg.children.length) {
-            group.addShape('rect', {
+            group.addShape("rect", {
               attrs: {
                 x: rectConfig.width / 2 - 8,
                 y: -8,
                 width: 16,
                 height: 16,
-                stroke: 'rgba(0, 0, 0, 0.25)',
-                cursor: 'pointer',
-                fill: '#fff',
+                stroke: "rgba(0, 0, 0, 0.25)",
+                cursor: "pointer",
+                fill: "#fff",
               },
-              name: 'collapse-back',
+              name: "collapse-back",
               modelId: cfg.id,
-            })
+            });
 
             // collpase text
-            group.addShape('text', {
+            group.addShape("text", {
               attrs: {
                 x: rectConfig.width / 2,
                 y: -1,
-                textAlign: 'center',
-                textBaseline: 'middle',
-                text: collapsed ? '+' : '-',
+                textAlign: "center",
+                textBaseline: "middle",
+                text: collapsed ? "+" : "-",
                 fontSize: 16,
-                cursor: 'pointer',
-                fill: 'rgba(0, 0, 0, 0.25)',
+                cursor: "pointer",
+                fill: "rgba(0, 0, 0, 0.25)",
               },
-              name: 'collapse-text',
+              name: "collapse-text",
               modelId: cfg.id,
-            })
+            });
           }
 
-          this.drawLinkPoints(cfg, group)
-          return rect
+          this.drawLinkPoints(cfg, group);
+          return rect;
         },
         update(cfg, item) {
-          const group = item.getContainer()
-          this.updateLinkPoints(cfg, group)
+          const group = item.getContainer();
+          this.updateLinkPoints(cfg, group);
         },
         setState(name, value, item) {
-          if (name === 'collapse') {
-            const group = item.getContainer()
+          if (name === "collapse") {
+            const group = item.getContainer();
             const collapseText = group.find(
-              e => e.get('name') === 'collapse-text'
-            )
+              (e) => e.get("name") === "collapse-text"
+            );
             if (collapseText) {
               if (!value) {
                 collapseText.attr({
-                  text: '-',
-                })
+                  text: "-",
+                });
               } else {
                 collapseText.attr({
-                  text: '+',
-                })
+                  text: "+",
+                });
               }
             }
           }
@@ -358,188 +441,150 @@ onMounted(() => {
           return [
             [0, 0.5],
             [1, 0.5],
-          ]
+          ];
         },
       },
-      'rect'
-    )
+      "rect"
+    );
 
     G6.registerEdge(
-      'flow-cubic',
+      "flow-cubic",
       {
         getControlPoints(cfg) {
-          let controlPoints = cfg.controlPoints // 指定controlPoints
+          let controlPoints = cfg.controlPoints; // 指定controlPoints
           if (!controlPoints || !controlPoints.length) {
-            const { startPoint, endPoint, sourceNode, targetNode } = cfg
+            const { startPoint, endPoint, sourceNode, targetNode } = cfg;
             const {
               x: startX,
               y: startY,
               coefficientX,
               coefficientY,
-            } = sourceNode ? sourceNode.getModel() : startPoint
+            } = sourceNode ? sourceNode.getModel() : startPoint;
             const { x: endX, y: endY } = targetNode
               ? targetNode.getModel()
-              : endPoint
-            let curveStart = (endX - startX) * coefficientX
-            let curveEnd = (endY - startY) * coefficientY
-            curveStart = curveStart > 40 ? 40 : curveStart
-            curveEnd = curveEnd < -30 ? curveEnd : -30
+              : endPoint;
+            let curveStart = (endX - startX) * coefficientX;
+            let curveEnd = (endY - startY) * coefficientY;
+            curveStart = curveStart > 40 ? 40 : curveStart;
+            curveEnd = curveEnd < -30 ? curveEnd : -30;
             controlPoints = [
               { x: startPoint.x + curveStart, y: startPoint.y },
               { x: endPoint.x + curveEnd, y: endPoint.y },
-            ]
+            ];
           }
-          return controlPoints
+          return controlPoints;
         },
         getPath(points) {
-          const path = []
-          path.push(['M', points[0].x, points[0].y])
+          const path = [];
+          path.push(["M", points[0].x, points[0].y]);
           path.push([
-            'C',
+            "C",
             points[1].x,
             points[1].y,
             points[2].x,
             points[2].y,
             points[3].x,
             points[3].y,
-          ])
-          return path
+          ]);
+          return path;
         },
       },
-      'single-line'
-    )
-  }
+      "single-line"
+    );
+  };
 
-  registerFn()
+  registerFn();
 
-  const { data } = props
+  const { data } = props1;
 
-
-  const initGraph = data => {
+  const initGraph = (data) => {
     if (!data) {
-      return
+      return;
     }
-    const { onInit, config } = props
+
+    const { onInit, config } = props1;
     const tooltip = new G6.Tooltip({
       offsetX: 20,
       offsetY: 30,
-      itemTypes: ['node'],
-      getContent: e => {
-        const outDiv = document.createElement('div')
-        const nodeName = e.item.getModel().name
-        let formatedNodeName = ''
+      itemTypes: ["node"],
+      getContent: (e) => {
+        const outDiv = document.createElement("div");
+        const nodeName = e.item.getModel().name;
+        let formatedNodeName = "";
         for (let i = 0; i < nodeName.length; i++) {
-          formatedNodeName = `${formatedNodeName}${nodeName[i]}`
+          formatedNodeName = `${formatedNodeName}${nodeName[i]}`;
           if (i !== 0 && i % 20 === 0)
-            formatedNodeName = `${formatedNodeName}<br/>`
+            formatedNodeName = `${formatedNodeName}<br/>`;
         }
-        outDiv.innerHTML = `${formatedNodeName}`
-        return outDiv
+        outDiv.innerHTML = `${formatedNodeName}`;
+        return outDiv;
       },
-      shouldBegin: e => {
-        if (e.target.get('name') === 'name-shape') return true
-        return false
+      shouldBegin: (e) => {
+        if (e.target.get("name") === "name-shape") return true;
+        return false;
       },
-    })
-    let graph = null
+    });
+    const minimap = new G6.Minimap({
+      size: [100, 100],
+      className: "minimap",
+      type: "delegate",
+    });
+    let graph = null;
     graph = new G6.TreeGraph({
-      container: 'container',
+      container: "container",
       ...defaultConfig,
       ...config,
-      plugins: [tooltip],
-    })
-    if (typeof onInit === 'function') {
-      onInit(graph)
+      plugins: [tooltip, minimap],
+    });
+    if (typeof onInit === "function") {
+      onInit(graph);
     }
 
-    graph.zoom(config.defaultZoom || 1)
+    graph.zoom(config.defaultZoom || 1);
 
-    const handleCollapse = e => {
-      const target = e.target
-      const id = target.get('modelId')
-      const item = graph.findById(id)
-      const nodeModel = item.getModel()
-      // console.log(nodeModel)
-      nodeModel.collapsed = !nodeModel.collapsed
-      graph.layout()
-      graph.setItemState(item, 'collapse', nodeModel.collapsed)
-    }
-    graph.on('collapse-text:click', e => {
-      handleCollapse(e)
-    })
-    graph.on('collapse-back:click', e => {
-      handleCollapse(e)
+    const handleCollapse = (e) => {
+      const target = e.target;
+      const id = target.get("modelId");
+      const item = graph.findById(id);
+      const nodeModel = item.getModel();
+      nodeModel.collapsed = !nodeModel.collapsed;
+      graph.layout();
+      graph.setItemState(item, "collapse", nodeModel.collapsed);
+    };
+    graph.on("collapse-text:click", (e) => {
+      handleCollapse(e);
+    });
+    graph.on("collapse-back:click", (e) => {
+      handleCollapse(e);
       //console.log('click' + JSON.stringify(data))
-    })
-    graph.on('node:click', evt => {
-      const { item, target } = evt
-      const targetType = target.get('type')
-      const name = target.get('name')
+    });
+    graph.on("node:click", (evt) => {
+      const { item, target } = evt;
+      const targetType = target.get("type");
+      const name = target.get("name");
+      state.select = item.getModel();
       // 增加元素
-      if (targetType === 'marker') {
-        const model = item.getModel()
-        //console.log(JSON.stringify(model))
-        if (name === 'addPoint') {
-          if (!model.children) {
-            model.children = []
-          }
-          model.children.push({
-            id: model.id + '-' + model.children.length,
-            name: '',
-            label: '',
-            currency: '',
-            date: [],
-            fileList: [],
-            rate: 0,
-            status: 'B',
-            variableName: '未进行',
-            variableValue: 0,
-            variableUp: false,
-          })
+      if (targetType === "marker") {
+        const model = item.getModel();
+        if (name === "changePoint") {
+          state.resourceList = model.fileList;
 
-          graph.updateChild(model, model.id)
-        } else if (name === 'deletePoint') {
-          graph.removeChild(model.id)
-        } else if (name === 'changePoint') {
-          // console.log(JSON.stringify(model))
-
-          form.id = model.id
-            ? model.id
-            : Math.random()
-                .toString(16)
-                .slice(2)
-          for (var prop in form) {
-            
-            if (form.hasOwnProperty(prop) && model.hasOwnProperty(prop)) {
-              form[prop] = model[prop]
-            }
-          }
-          state.show = true
+          console.log(JSON.stringify(state.resourceList));
         }
-        console.log(JSON.stringify(data));
-        instance.proxy.$emit('childClick', data)
       }
-    })
-    graph.data(data)
-    graph.render()
+    });
+    graph.data(data);
+    graph.render();
     //graph.fitView()
-    state.graph = graph
-  }
-
-  initGraph(data)
-})
-
+    state.graph = graph;
+  };
+  initGraph(data);
+});
 </script>
 
 <style>
 #container {
-  overflow: hidden;
-}
-.g6-tooltip {
-  padding: 10px 6px;
-  color: #444;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e2e2e2;
-  border-radius: 4px;
+  text-align: center;
+  background-color: rgb(255, 255, 255);
 }
 </style>
