@@ -29,13 +29,32 @@ export default {
 
     })
     const find = () => {
-      console.log('查看')
-      console.log(state.data.id);
-       instance.proxy.$router.push({ path: '/detail', query: { id: state.data.id } })
+      state.data.startTime=transDate(state.data.startTime)
+      state.data.endTime=transDate(state.data.endTime)
+
+       instance.proxy.$router.push({ path: '/detail', query: { id: state.data.id,data:JSON.stringify(state.data)} })
     }
+     const transDate = (obj) => {
+      // 创建一个日期对象，传入要转换的日期时间字符串作为参数
+      const dateTime = new Date(obj);
+
+      // 使用日期对象的方法获取年、月、日、小时、分钟和秒数
+      const year = dateTime.getFullYear();
+      const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
+      const day = ("0" + dateTime.getDate()).slice(-2);
+      const hour = ("0" + dateTime.getHours()).slice(-2);
+      const minute = ("0" + dateTime.getMinutes()).slice(-2);
+      const second = ("0" + dateTime.getSeconds()).slice(-2);
+
+      // 将年、月、日、小时、分钟和秒数组合成所需的格式
+      const formattedDateTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+      return formattedDateTime;
+    };
     return {
       ...toRefs(state),
       find,
+      transDate,
     }
   },
   mounted() {

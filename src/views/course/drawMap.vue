@@ -1,62 +1,139 @@
 <template>
-  <div id="container"></div>
-  <el-form>
-    <el-form-item label="反馈节点">
-      <el-input v-model="state.select.name" :disabled="true"></el-input>
-      <el-button type="primary" @click="seeFeedback">反馈</el-button>
-    </el-form-item>
-    <el-form-item label="资源列表">
-      <el-table :data="state.resourceList" style="width: 100%">
-        <el-table-column prop="name" label="名称" width="180" key="slot">
-          <!-- 去除文件名后缀 -->
-          <template #default="scope">
-            <span>{{ scope.row.name.split(".")[0] }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="type" label="类型" width="180">
-        </el-table-column>
-        <el-table-column prop="size" label="大小" width="180">
-        </el-table-column>
-        <el-table-column
-          prop="updateTime"
-          label="上传时间"
-          width="180"
-          key="slot"
+  <div id="sc">
+    <el-descriptions
+      ref="desc"
+      class="margin-top"
+      direction="vertical"
+      border
+      :column="3"
+      :size="mini"
+    >
+      <el-descriptions-item label="课程名称">{{
+        data.courseName
+      }}</el-descriptions-item>
+      <el-descriptions-item label="开课时间">{{
+        data.startTime
+      }}</el-descriptions-item>
+      <el-descriptions-item label="结课时间">{{
+        data.endTime
+      }}</el-descriptions-item>
+      <el-descriptions-item label="任课教师">
+        <el-tag size="small">{{ data.teacherName }}</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item label="分数占比"
+        >江苏省苏州市吴中区吴中大道 1188 号</el-descriptions-item
+      >
+    </el-descriptions>
+    <div id="container"></div>
+    <el-form
+      style="
+        margin-top: 10px;
+        background-color: rgb(255, 255, 255);
+        padding: 10px 5px;
+      "
+    >
+      <el-form-item label="反馈节点">
+        <el-input
+          v-model="state.select.name"
+          :disabled="true"
+          style="width: 80%"
+        ></el-input>
+        <el-button type="primary" @click="seeFeedback" style="float: right"
+          >反馈</el-button
         >
-          <!-- 格式化 -->
-          <template #default="scope">
-            <span>{{ scope.row.updateTime.split("T")[0] }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="percentage" label="进度" width="180"
-          ><template slot-scope="scope">
-            <i class="el-icon-time"></i>
-            <span style="margin-left: 10px">{{ scope }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="url" label="浏览" width="180" key="slot">
-          <template #default="scope">
-            <el-link type="primary" :href="scope.row.url" target="_blank"
-              >浏览</el-link
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-form-item>
-  </el-form>
+      </el-form-item>
+      <el-form-item label="资源列表">
+        <div style="width: 100%">
+          <el-table :data="state.resourceList" style="width: 100%">
+            <el-table-column prop="name" label="名称" key="slot">
+              <template #default="scope">
+                <span>{{ scope.row.name.split(".")[0] }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="type" label="类型"> </el-table-column>
+            <el-table-column prop="size" label="大小"> </el-table-column>
+            <el-table-column prop="updateTime" label="上传时间" key="slot">
+              <!-- 格式化 -->
+              <template #default="scope">
+                <span>{{ scope.row.updateTime.split("T")[0] }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="percentage" label="进度"
+              ><template slot-scope="scope">
+                <i class="el-icon-time"></i>
+                <span style="margin-left: 10px">{{ scope }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="url" label="浏览" key="slot">
+              <template #default="scope">
+                <el-button type="primary" @click="seeResource(scope.row.url)" >浏览</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-form-item>
+    </el-form>
 
-  <el-dialog
-    title="反馈"
-    :visible.sync="dialogVisible"
-    width="width"
-    :before-close="dialogBeforeClose"
-  >
-    <div></div>
-    <div slot="footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-    </div>
-  </el-dialog>
+    <el-dialog
+      title="反馈列表"
+      v-model="dialogVisible"
+      width="80%"
+      :before-close="dialogBeforeClose"
+    >
+    <el-form>
+      <el-form-item>
+         <el-table
+        :data="state.form"
+        style="width: 100%"
+        height="250">
+    <el-table-column
+      fixed
+      prop="userFromName"
+      label="发信人"
+width="120"
+      >
+    </el-table-column>
+    <el-table-column
+      prop="userToName"
+      label="收信人"
+      width="120"
+      >
+    </el-table-column>
+    <el-table-column
+      prop="content"
+      label="内容"
+
+    >
+    </el-table-column>
+    <el-table-column
+      prop="time"
+      label="发送时间"
+    width="150"
+     >
+
+    </el-table-column>
+  </el-table>
+      </el-form-item>
+      <el-form-item label="内容">
+        <el-input type="textarea" v-model="state.content" :rows="4"></el-input>
+      </el-form-item>
+    </el-form>
+       
+
+      <div slot="footer" style="text-align: center;">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="sendFeedBack">发送</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="资源浏览" v-model="state.resDialogVisible">
+      <iframe
+        :src="state.url"
+        frameborder="0"
+        width="100%"
+        height="500px"
+      ></iframe>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup>
@@ -64,8 +141,13 @@ import { onMounted, reactive, ref, getCurrentInstance, watch } from "vue";
 import G6 from "@antv/g6";
 import axios from "axios";
 import * as API from "@/api/Course";
+import * as FeedBack from "@/api/feedback";
 // 声明接收父组件传递的属性
 const props = defineProps({
+  id: {
+    type: Number,
+    required: true,
+  },
   data: {
     type: Object,
     required: true,
@@ -73,30 +155,105 @@ const props = defineProps({
 });
 const instance = getCurrentInstance();
 const state = reactive({
-  // data: props.data,
   graph: null,
   dialogVisible: false,
   form: [],
   resourceList: [],
   select: {},
+  data: JSON.parse(props.data),
+  content: "",
+  resDialogVisible: false,
+  url:'',
 });
-const data = ref(props.data);
+const dialogVisible = ref(false);
+const data = ref(JSON.parse(props.data));
 const form = ref(null);
 const seeFeedback = async () => {
-  console.log(JSON.stringify(state.select));
-  const res = await API.getFeedBack({ id: select.sid });
+  console.log("select", state.select);
+  if (state.select.sid == undefined) {
+    instance.proxy.$message({
+      message: "请选择反馈节点",
+      type: "error",
+    });
+    return;
+  }
+  const res = await FeedBack.getList({ id: state.select.sid });
   if (res.rspCode == "200") {
+    
     state.form = res.data;
+    state.form.forEach(element => {
+      element.time=transDate(element.time)
+    });
+    dialogVisible.value = true;
   } else {
     instance.proxy.$message({
       message: res.errMsg,
       type: "error",
     });
   }
-  state.dialogVisible = true;
 };
+const transDate = (obj) => {
+      // 创建一个日期对象，传入要转换的日期时间字符串作为参数
+      const dateTime = new Date(obj);
+
+      // 使用日期对象的方法获取年、月、日、小时、分钟和秒数
+      const year = dateTime.getFullYear();
+      const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
+      const day = ("0" + dateTime.getDate()).slice(-2);
+      const hour = ("0" + dateTime.getHours()).slice(-2);
+      const minute = ("0" + dateTime.getMinutes()).slice(-2);
+      const second = ("0" + dateTime.getSeconds()).slice(-2);
+
+      // 将年、月、日、小时、分钟和秒数组合成所需的格式
+      const formattedDateTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+      return formattedDateTime;
+    };
+const sendFeedBack=async ()=>{
+  console.log('data',data.value.teacherId);
+  var params={
+    "sid":state.select.sid,
+    "content":state.content,
+    "userToId":data.value.teacherId,
+    "userFromId":19,
+  };
+  const res = await FeedBack.add(params);
+  if (res.rspCode === "200") {
+    instance.proxy.$message({
+      message: "发送成功",
+      type: "success",
+    });
+    reloadForm();
+  } else {
+    alert(res.errMsg);
+    instance.proxy.$message({
+      message: res.errMsg,
+      type: "error",
+    });
+  }
+
+}
+const reloadForm=async ()=>{
+  const res = await FeedBack.getList({ id: state.select.sid });
+  if (res.rspCode == "200") {
+    state.form = res.data;
+    state.form.forEach(element => {
+      element.time=transDate(element.time)
+    });
+  } else {
+    instance.proxy.$message({
+      message: res.errMsg,
+      type: "error",
+    });
+  }
+}
+const seeResource=(url)=>{
+  if(url!==null){
+    state.url=url;
+  }
+  state.resDialogVisible=true;
+}
 onMounted(async () => {
-  //console.log(props.data)
   const colors = {
     B: "#5B8FF9",
     R: "#F46649",
@@ -104,8 +261,8 @@ onMounted(async () => {
     G: "#5BD8A6",
     DI: "#A7A7A7",
   };
-
-  const res = await API.getDetail({ id: props.data });
+  console.log(state.data);
+  const res = await API.getDetail({ id: props.id });
   if (res.rspCode == "200") {
     state.data = res.data;
   } else {
@@ -155,7 +312,7 @@ onMounted(async () => {
     width,
     height,
     modes: {
-      default: ["zoom-canvas", "drag-canvas"],
+      default: ["zoom-canvas"],
     },
     fitView: true,
     animate: true,
@@ -496,7 +653,10 @@ onMounted(async () => {
   registerFn();
 
   const { data } = props1;
-
+  const scrollToBottom = () => {
+    const el = document.getElementById("container");
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const initGraph = (data) => {
     if (!data) {
       return;
@@ -525,7 +685,7 @@ onMounted(async () => {
       },
     });
     const minimap = new G6.Minimap({
-      size: [100, 100],
+      size: [200, 100],
       className: "minimap",
       type: "delegate",
     });
@@ -562,14 +722,14 @@ onMounted(async () => {
       const { item, target } = evt;
       const targetType = target.get("type");
       const name = target.get("name");
-      state.select = item.getModel();
+
       // 增加元素
       if (targetType === "marker") {
         const model = item.getModel();
         if (name === "changePoint") {
+          state.select = model;
           state.resourceList = model.fileList;
-
-          console.log(JSON.stringify(state.resourceList));
+          scrollToBottom();
         }
       }
     });
@@ -584,7 +744,12 @@ onMounted(async () => {
 
 <style>
 #container {
+  margin-top: 10px;
   text-align: center;
   background-color: rgb(255, 255, 255);
+}
+.margin-top {
+  background-color: rgb(231, 208, 208);
+  padding: 4px;
 }
 </style>

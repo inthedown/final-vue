@@ -8,14 +8,13 @@
     :pagination="paginationConfig"
     @selectionChange="handleSelectionChange"
   >
-  <template #teacher="{ row }">
-      {{row.teacherName}}
+    <template #teacher="{ row }">
+      {{ row.teacherName }}
     </template>
-  <template #state="{ row }">
-        <el-tag v-if="row.state === '未开始'" type="info">未开始</el-tag>
-        <el-tag v-if="row.state === '进行中'" type="success">进行中</el-tag>
-<el-tag v-if="row.state === '已结束'" type="warning">已结束</el-tag>
-
+    <template #state="{ row }">
+      <el-tag v-if="row.state === '未开始'" type="info">未开始</el-tag>
+      <el-tag v-if="row.state === '进行中'" type="success">进行中</el-tag>
+      <el-tag v-if="row.state === '已结束'" type="warning">已结束</el-tag>
     </template>
     <!-- 工具栏 -->
     <template #toolbar>
@@ -63,7 +62,7 @@ export default defineComponent({
         { label: "课程名称", prop: "courseName", width: 120 },
         { label: "开始时间", prop: "startTime", minWidth: 120 },
         { label: "结束时间", prop: "endTime", minWidth: 140 },
-        { label: "课程状态", prop: "state", width: 120, tdSlot: "state"},
+        { label: "课程状态", prop: "state", width: 120, tdSlot: "state" },
         { label: "任课老师", prop: "teacher", width: 120, tdSlot: "teacher" },
         { label: "课程小节数", prop: "sessionNum" },
         {
@@ -105,20 +104,20 @@ export default defineComponent({
         console.log(state.selectedItems == 0);
         if (state.selectedItems.length == 0) {
           instance.proxy.$message({
-            message: "请选择要删除的用户",
+            message: "请选择要删除的课程",
             type: "error",
           });
           return;
         }
         instance.proxy
-          .$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
+          .$confirm("此操作将永久删除该课程, 是否继续?", "提示", {
             confirmButtonText: "确定",
             cancelButtonText: "取消",
             type: "warning",
           })
           .then(async () => {
             const ids = state.selectedItems.map((item) => item.id);
-            const res = await API.deleteUser(ids);
+            const res = await API.delete(ids);
             if (res.rspCode == 200) {
               instance.proxy.$message({
                 message: "删除成功",
@@ -161,9 +160,10 @@ export default defineComponent({
           }
         });
         data.forEach((item) => {
-          item['startTime']=item['startTime'].split('T')[0]
-          item['endTime']=item['endTime'].split('T')[0]
-          item['state']=exState(item)
+          //2023-04-05T08:00:00.000+00:00转成2023-04-05 08:00:00
+          item["startTime"] =transDate( item["startTime"]);
+          item["endTime"] = transDate(item["endTime"]);
+          item["state"] = exState(item);
         });
 
         return {
@@ -172,34 +172,34 @@ export default defineComponent({
         };
       },
     });
-    const exState=(obj)=>{
-        var startTime = new Date(obj.startTime);
-        var endTime = new Date(obj.endTime);
-        var now = new Date();
-        if(startTime>now){
-            return "未开始";
-        }else if(startTime<now&&endTime>now){
-           return  "进行中";
-        }else{
-            return "已结束";
-        }
-
-    }
-    const countSessions = (obj) => {
-      let count = 0;
-      if (obj instanceof Array) {
-        obj.forEach((item) => {
-          count += countSessions(item);
-        });
-      } else if (obj instanceof Object) {
-        if (obj.hasOwnProperty("sessionName")) {
-          count += 1;
-        }
-        Object.keys(obj).forEach((key) => {
-          count += countSessions(obj[key]);
-        });
+    const exState = (obj) => {
+      var startTime = new Date(obj.startTime);
+      var endTime = new Date(obj.endTime);
+      var now = new Date();
+      if (startTime > now) {
+        return "未开始";
+      } else if (startTime < now && endTime > now) {
+        return "进行中";
+      } else {
+        return "已结束";
       }
-      return count;
+    };
+    const transDate = (obj) => {
+      // 创建一个日期对象，传入要转换的日期时间字符串作为参数
+      const dateTime = new Date(obj);
+
+      // 使用日期对象的方法获取年、月、日、小时、分钟和秒数
+      const year = dateTime.getFullYear();
+      const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
+      const day = ("0" + dateTime.getDate()).slice(-2);
+      const hour = ("0" + dateTime.getHours()).slice(-2);
+      const minute = ("0" + dateTime.getMinutes()).slice(-2);
+      const second = ("0" + dateTime.getSeconds()).slice(-2);
+
+      // 将年、月、日、小时、分钟和秒数组合成所需的格式
+      const formattedDateTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+      return formattedDateTime;
     };
     const table = ref(null);
     const refresh = () => {
@@ -210,8 +210,8 @@ export default defineComponent({
       ...toRefs(state),
       refresh,
       table,
-      countSessions,
       formLabelWidth,
+      transDate
     };
   },
 });

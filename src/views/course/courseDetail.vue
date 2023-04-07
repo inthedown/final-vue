@@ -1,5 +1,5 @@
 <template>
-<draw-map :data="id" :teacher="teacher"></draw-map>
+<draw-map :id="id" :data="data"></draw-map>
 </template>
 
 <script>
@@ -15,9 +15,9 @@ export default {
   setup() {
      const route = useRoute()
     const state = reactive({
-      data:null,
+      data:route.query.data,
       id:route.query.id,
-      teacher:null,
+  
     });
   
   
@@ -25,16 +25,15 @@ export default {
     const route = useRoute()
     const id = route.query.id
      const instance = getCurrentInstance();
-    const res=await API.getDetail({"id":id})
-      if (res.rspCode == '200') {
-        state.data = res.data; 
-        console.log('state'+JSON.stringify(state.data));   
-      } else {
-        instance.proxy.$message({
-          message: res.errMsg,
-          type: "error",
-        });
-      }
+    // const res=await API.getDetail({"id":id})
+    //   if (res.rspCode == '200') {
+    //     state.data = res.data; 
+    //   } else {
+    //     instance.proxy.$message({
+    //       message: res.errMsg,
+    //       type: "error",
+    //     });
+    //   }
   } )
    return {
       ...toRefs(state),
