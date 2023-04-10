@@ -16,7 +16,9 @@ import course from './modules/course'
 // 固定菜单
 export const fixedRoutes = [...home, ...course,...user]
 // 动态菜单
-export const asyncRoutes = []
+export const asyncRoutes = [
+  
+]
 
 const router = createRouter({
   history: createWebHashHistory(),

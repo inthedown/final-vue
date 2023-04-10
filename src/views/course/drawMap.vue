@@ -125,19 +125,19 @@ width="120"
         <el-button type="primary" @click="sendFeedBack">发送</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="资源浏览" v-model="state.resDialogVisible">
-      <iframe
-        :src="state.url"
-        frameborder="0"
-        width="100%"
-        height="500px"
-      ></iframe>
+    <el-dialog title="资源浏览" v-model="state.resDialogVisible"  
+    after-open="setTime" after-close="clearTime" 
+>
+      <iframe :src="state.url" class="myIframe"></iframe>
+      <div slot="footer" style="text-align: center;">
+        <el-button @click="state.resDialogVisible = false">取 消</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, getCurrentInstance, watch } from "vue";
+import { onMounted, reactive, ref, getCurrentInstance, watch, computed } from "vue";
 import G6 from "@antv/g6";
 import axios from "axios";
 import * as API from "@/api/Course";
@@ -163,11 +163,13 @@ const state = reactive({
   data: JSON.parse(props.data),
   content: "",
   resDialogVisible: false,
-  url:'',
+  url:'about:blank',
 });
 const dialogVisible = ref(false);
 const data = ref(JSON.parse(props.data));
 const form = ref(null);
+
+
 const seeFeedback = async () => {
   console.log("select", state.select);
   if (state.select.sid == undefined) {
@@ -253,7 +255,9 @@ const seeResource=(url)=>{
   }
   state.resDialogVisible=true;
 }
+
 onMounted(async () => {
+  //获取iframe
   const colors = {
     B: "#5B8FF9",
     R: "#F46649",
@@ -739,6 +743,7 @@ onMounted(async () => {
     state.graph = graph;
   };
   initGraph(data);
+  
 });
 </script>
 
@@ -751,5 +756,14 @@ onMounted(async () => {
 .margin-top {
   background-color: rgb(231, 208, 208);
   padding: 4px;
+}
+.myIframe {
+
+  height: 500px;
+  /* 自适应缩放 */
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  border: none;
 }
 </style>

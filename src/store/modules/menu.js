@@ -1,14 +1,3 @@
-/*
- * @Descripttion:
- * @version:
- * @Date: 2021-04-20 11:06:21
- * @LastEditors: huzhushan@126.com
- * @LastEditTime: 2021-07-26 18:22:01
- * @Author: huzhushan@126.com
- * @HomePage: https://huzhushan.gitee.io/vue3-element-admin
- * @Github: https://github.com/huzhushan/vue3-element-admin
- * @Donate: https://huzhushan.gitee.io/vue3-element-admin/donate/
- */
 import { fixedRoutes, asyncRoutes } from '@/router'
 import { GetMenus } from '@/api/menu'
 import router from '@/router'
