@@ -20,6 +20,7 @@
     "last 2 versions"
   ],
   "dependencies": {
+    "@antv/g2": "^5.0.2",
     "@antv/g6": "^4.8.5",
     "axios": "^0.21.1",
     "echarts": "^5.3.3",

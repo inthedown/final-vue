@@ -10,6 +10,6 @@ export const getList = data => {
     return request({
       url: '/api/feedback/getList',
       method: 'post',
-      params:data,
+      data:data,
     })
 }
