@@ -1,30 +1,54 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div id="container"></div>
 </template>
 
 <script>
-import * as echarts from 'echarts'
-
+import G6 from '@antv/g6';
 
 export default {
 
-  props: {
-    className: {
-      type: String,
-      default: 'chart'
-    },
-    width: {
-      type: String,
-      default: '100%'
-    },
-    height: {
-      type: String,
-      default: '300px'
-    }
-  },
+  name: 'shebeiChart',
   data() {
     return {
-      chart: null
+      data:{
+        nodes: [{id:'数据库原理',
+        label:'数据库原理',
+        donutAttrs: {
+          income: 4,
+          outcome: 12,
+          unknown: 22
+        }},{id:'范式',
+        label:'范式',
+        donutAttrs: {
+          income: 4,
+          outcome: 32,
+          unknown: 12
+        }},{id:'mysql',
+        label:'mysql',
+        donutAttrs: {
+          income: 12,
+          outcome: 22,
+          unknown: 2
+        }},{id:'关系型数据库',
+        label:'关系型数据库',
+        donutAttrs: {
+          income: 12,
+          outcome: 12,
+          unknown: 22
+        }},{id:'非关系型数据库',
+        label:'非关系型数据库',
+        donutAttrs: {
+          income: 14,
+          outcome: 2,
+          unknown: 22
+        }}],
+        edges: [
+    {source: '数据库原理', target: '范式', size: 10},
+    {source: '范式', target: 'mysql', size: 5},
+    {source: '范式', target: '关系型数据库', size: 20},
+    {source: '关系型数据库', target: '非关系型数据库', size: 5}
+  ]
+      }
     }
   },
   mounted() {
@@ -32,62 +56,175 @@ export default {
       this.initChart()
     })
   },
-  beforeUnmount() {
-    if (!this.chart) {
-      return
-    }
-    this.chart.dispose()
-    this.chart = null
-  },
   methods: {
     initChart() {
-      this.chart = echarts.init(this.$el, 'macarons')
+      const data={
+        nodes: [{id:'数据库原理',
+        label:'数据库原理',
+        donutAttrs: {
+          income: 4,
+          outcome: 12,
+          unknown: 22
+        }},{id:'范式',
+        label:'范式',
+        donutAttrs: {
+          income: 4,
+          outcome: 32,
+          unknown: 12
+        }},{id:'mysql',
+        label:'mysql',
+        donutAttrs: {
+          income: 12,
+          outcome: 22,
+          unknown: 2
+        }},{id:'关系型数据库',
+        label:'关系型数据库',
+        donutAttrs: {
+          income: 12,
+          outcome: 12,
+          unknown: 22
+        }},{id:'非关系型数据库',
+        label:'非关系型数据库',
+        donutAttrs: {
+          income: 14,
+          outcome: 2,
+          unknown: 22
+        }}],
+        edges: [
+    {source: '数据库原理', target: '范式', size: 10},
+    {source: '范式', target: 'mysql', size: 5},
+    {source: '范式', target: '关系型数据库', size: 20},
+    {source: '关系型数据库', target: '非关系型数据库', size: 5}
+  ]
+      };
+      data.edges.forEach(edge=> {
+  edge.label = `transfer ${edge.size}`
+})
 
-      this.chart.setOption({
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          left: 'center',
-          bottom: '10',
-          data: ['离线', '播放', '空闲']
-        },
-        series: [
-          {
-            name: '设备状态',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2
-            },
-            label: {
-            show: false,
-            position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: '40',
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data: [
-              { value: 1, name: '离线' },
-              { value: 2, name: '播放' },
-              { value: 1, name: '空闲' }
-            ],
-            animationEasing: 'cubicInOut',
-            animationDuration: 2600
-          }
-        ]
-      })
+const colors = {
+  'income': '#61DDAA',
+  'outcome': '#F08BB4',
+  'unknown': '#65789B'
+}
+
+data.nodes.forEach(node => {
+  node.donutColorMap = colors;
+  node.size = 0;
+  Object.keys(node.donutAttrs).forEach(key => {
+    node.size += node.donutAttrs[key];
+  })
+  node.size = Math.sqrt(node.size) * 5
+})
+
+
+const legendData = {
+  nodes: [{
+    id: 'income',
+    label: '已完成',
+    order: 0,
+    style: {
+      fill: '#61DDAA',
+    }
+  }, {
+    id: 'outcome',
+    label: '未完成',
+    order: 2,
+    style: {
+      fill: '#F08BB4',
+    }
+  }, {
+    id: 'Unknown',
+    label: '进行中',
+    order: 2,
+    style: {
+      fill: '#65789B',
+    }
+  }]
+}
+const legend = new G6.Legend({
+  data: legendData,
+  align: 'center',
+  layout: 'horizontal', // vertical
+  position: 'bottom-left',
+  vertiSep: 12,
+  horiSep: 24,
+  offsetY: -24,
+  padding: [4, 16, 8, 16],
+  containerStyle: {
+    fill: '#ccc',
+    lineWidth: 1
+  },
+  title: ' ',
+  titleConfig: {
+    offsetY: -8,
+  },
+});
+
+
+const width = 700;
+const height = 300;
+const graph = new G6.Graph({
+  container: 'container',
+  width,
+  height,
+  // translate the graph to align the canvas's center, support by v3.5.1
+  fitCenter: true,
+  plugins: [legend],
+  modes: {
+    default: ['drag-canvas', 'drag-node', 'zoom-canvas'],
+  },
+  layout: {
+    type: 'radial',
+    focusNode: 'li',
+    linkDistance: 200,
+    unitRadius: 200
+  },
+  defaultEdge: {
+    style: {
+      endArrow: true
+    },
+    labelCfg: {
+      autoRotate: true,
+      style: {
+        stroke: "#fff",
+        lineWidth: 5
+      }
+    }
+  },
+  defaultNode: {
+    type: 'donut',
+    style: {
+      lineWidth: 0,
+    },
+    labelCfg: {
+      position: 'bottom',
+    },
+  },
+});
+
+graph.data(data);
+graph.render();
+graph.fitView();
+graph.on('node:mouseenter', (evt) => {
+  const { item } = evt;
+  graph.setItemState(item, 'active', true);
+});
+
+graph.on('node:mouseleave', (evt) => {
+  const { item } = evt;
+  graph.setItemState(item, 'active', false);
+});
+
+graph.on('node:click', (evt) => {
+  const { item } = evt;
+  graph.setItemState(item, 'selected', true);
+});
+graph.on('canvas:click', (evt) => {
+  graph.getNodes().forEach((node) => {
+    graph.clearItemStates(node);
+  });
+});
+
     }
   }
 }

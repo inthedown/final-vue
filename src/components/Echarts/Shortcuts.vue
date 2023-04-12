@@ -4,8 +4,8 @@
             <div class="ve-card ve_card1">
                 <img src="/src/assets/img/设备.png">
                 <div>
-                    <p>设备数量</p>
-                    <span>6</span>
+                    <p>开课数量</p>
+                    <span>5</span>
                 </div>
             </div>
         </el-col>
@@ -13,8 +13,8 @@
             <div class="ve-card ve_card1">
                 <img src="/src/assets/img/节目.png">
                 <div>
-                    <p>节目数量</p>
-                    <span>6</span>
+                    <p>反馈数量</p>
+                    <span>33</span>
                 </div>
             </div>
         </el-col>
@@ -22,8 +22,8 @@
             <div class="ve-card ve_card1">
                 <img src="/src/assets/img/计划.png">
                 <div>
-                    <p>计划数量</p>
-                    <span>6</span>
+                    <p>学生数量</p>
+                    <span>56</span>
                 </div>
             </div>
         </el-col>

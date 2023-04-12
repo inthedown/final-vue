@@ -1,5 +1,5 @@
 <template>
-    <div class="head-title">计划审核提醒</div>
+    <div class="head-title">学生反馈提醒</div>
     <el-table
       :data="vist_page_data"
       height="300"
@@ -7,8 +7,8 @@
       style="width: 100%"
     >
       <el-table-column type="index" label="序号" width="50"></el-table-column>
-      <el-table-column prop="plan_name" label="计划名称"></el-table-column>
-      <el-table-column prop="plan_status" label="计划状态"></el-table-column>
+      <el-table-column prop="plan_name" label="课程名称"></el-table-column>
+      <el-table-column prop="plan_status" label="节点名称"></el-table-column>
       <el-table-column sortable prop="date" label="提交时间"></el-table-column>
       <el-table-column prop="name" label="提交人"></el-table-column>
       <!-- <el-table-column prop="user_name" label="用户名"></el-table-column>
@@ -73,8 +73,8 @@ export default {
     },
     init_vist_data() {
       const name = ["孙国豪", "臭华子", "孙天熔", "饶黎明"];
-      const plan_name = ["Bret", "Antonette", "Samantha", "Karianne"];
-      const plan_status = ["已发布", "待发布", "已失效", "已结束"];
+      const plan_name = ["计算机算法", "操作系统原理", "java基础", "艺术设计"];
+      const plan_status = ["图", "操作系统", "命令行", "设计"];
       const pages = ["论坛", "手册", "教程", "注册"];
       var time = new Date();
       const vist_data = {

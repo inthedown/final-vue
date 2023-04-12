@@ -26,7 +26,7 @@ export default [
       message: '获取用户信息成功',
       data: {
         id: 1,
-        name: '臭华子',
+        name: '饶黎明',
         'role|1': ['admin', 'visitor'], // 随机返回一个角色admin或visitor
         avatar: '../src/assets/img/猪头.webp',
       },

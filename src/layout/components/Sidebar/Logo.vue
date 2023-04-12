@@ -1,8 +1,8 @@
 
 <template>
   <div class="brand">
-    <img class="logo" src="~@/assets/logo.svg" @click="goHome" />
-    <div class="title">画屏发布系统</div>
+    <img class="logo" src="~@/assets/svg/学习平台.svg" @click="goHome" />
+    <div class="title">在线学习平台</div>
   </div>
 </template>
 <script>

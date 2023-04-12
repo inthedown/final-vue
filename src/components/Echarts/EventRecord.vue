@@ -8,6 +8,7 @@
     >
       <!-- <el-table-column type="index" label="序号" width="50"></el-table-column> -->
       <el-table-column prop="event_type" label=""></el-table-column>
+      <el-table-column prop="event_name" label=""></el-table-column>
       <el-table-column prop="event" label=""></el-table-column>
       <el-table-column prop="date" label=""></el-table-column>
       <!-- <el-table-column prop="user_name" label="用户名"></el-table-column>
@@ -72,16 +73,17 @@ export default {
       console.log(pn);
     },
     init_vist_data() {
-      const event_type = ["计划", "设备"];
-      const event = ["已被拒绝", "发布成功", "注册成功", "已上线"];
+      const event_type = ["课程", "节点"];
+      const event_name=["图","算法","设计","数据结构","计算机网络","操作系统","数据库","编译原理","计算机组成原理","计算机体系结构","计算机系统结构",]
+      const event = ["开放", "结束", "进行中", "倒计时"];
       
     
       var time = new Date();
       const vist_data = {
         event_type: '【'+event_type[parseInt(Math.random() * (1 - 0 + 1) + 0, 10)]+'】',
         event: event[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)],
-        // plan_status: plan_status[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)],
-        // vist_page: pages[parseInt(Math.random() * (3 - 0 + 1) + 0, 10)],
+        event_name: event_name[parseInt(Math.random() * (10 - 0 + 1) + 0, 10)],
+
         date:
           time.getFullYear() +
           "-" +
