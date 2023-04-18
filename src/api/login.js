@@ -2,20 +2,20 @@
 import request from '@/utils/request'
 
 // 登录接口
-// export const Login = data => {
-//   return request({
-//     url: '/api/user1/login',
-//     method: 'post',
-//     data,
-//   })
-// }
 export const Login = data => {
   return request({
-    url: '/api/login',
+    url: '/api/user1/login',
     method: 'post',
     data,
   })
 }
+// export const Login = data => {
+//   return request({
+//     url: '/api/login',
+//     method: 'post',
+//     data,
+//   })
+// }
 
 // 获取登录用户信息
 export const GetUserinfo = () => {
