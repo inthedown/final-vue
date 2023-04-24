@@ -66,7 +66,9 @@
             </el-table-column>
             <el-table-column prop="url" label="浏览" key="slot">
               <template #default="scope">
-                <el-button type="primary" @click="seeResource(scope.row.url)" >浏览</el-button>
+                <el-button type="primary" @click="seeResource(scope.row)"
+                  >浏览</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -80,68 +82,83 @@
       width="80%"
       :before-close="dialogBeforeClose"
     >
-    <el-form>
-      <el-form-item>
-         <el-table
-        :data="state.form"
-        style="width: 100%"
-        height="250">
-    <el-table-column
-      fixed
-      prop="userFromName"
-      label="发信人"
-width="120"
-      >
-    </el-table-column>
-    <el-table-column
-      prop="userToName"
-      label="收信人"
-      width="120"
-      >
-    </el-table-column>
-    <el-table-column
-      prop="content"
-      label="内容"
+      <el-form>
+        <el-form-item>
+          <el-table :data="state.form" style="width: 100%" height="250">
+            <el-table-column
+              fixed
+              prop="userFromName"
+              label="发信人"
+              width="120"
+            >
+            </el-table-column>
+            <el-table-column prop="userToName" label="收信人" width="120">
+            </el-table-column>
+            <el-table-column prop="content" label="内容"> </el-table-column>
+            <el-table-column prop="time" label="发送时间" width="150">
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+        <el-form-item label="内容">
+          <el-input
+            type="textarea"
+            v-model="state.content"
+            :rows="4"
+          ></el-input>
+        </el-form-item>
+      </el-form>
 
-    >
-    </el-table-column>
-    <el-table-column
-      prop="time"
-      label="发送时间"
-    width="150"
-     >
-
-    </el-table-column>
-  </el-table>
-      </el-form-item>
-      <el-form-item label="内容">
-        <el-input type="textarea" v-model="state.content" :rows="4"></el-input>
-      </el-form-item>
-    </el-form>
-       
-
-      <div slot="footer" style="text-align: center;">
+      <div slot="footer" style="text-align: center">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="sendFeedBack">发送</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="资源浏览" v-model="state.resDialogVisible"  
-    after-open="setTime" after-close="clearTime" 
->
-      <iframe :src="state.url" class="myIframe"></iframe>
-      <div slot="footer" style="text-align: center;">
-        <el-button @click="state.resDialogVisible = false">取 消</el-button>
+    <el-dialog
+      title="资源浏览"
+      v-model="state.resDialogVisible"
+      @close="dialogBeforeClose"
+    >
+      <div v-if="state.type == 'vedio'">
+        <video
+          id="videoElement"
+          controls
+          autoplay
+          :src="state.url"
+          style="width: 100%; height: 100%"
+        ></video>
+      </div>
+      <div v-else-if="state.type == 'image'">
+        <img :src="state.url" style="width: 100%; height: 100%" />
+      </div>
+      <div v-else-if="state.type == 'mp3'">
+        <audio id="audioElement" controls autoplay :src="state.url"></audio>
+      </div>
+      <div style="margin: 0 auto; text-align: center" v-else>
+        <!-- 显示资源格式错误 -->
+        <img src="@/assets/img/fileWarn.png" alt="" />
+      </div>
+
+      <div slot="footer" style="text-align: center">
+        <el-button @click="state.resDialogVisible = false">关闭</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, getCurrentInstance, watch, computed } from "vue";
+import {
+  onMounted,
+  reactive,
+  ref,
+  getCurrentInstance,
+  watch,
+  computed,
+} from "vue";
 import G6 from "@antv/g6";
 import axios from "axios";
 import * as API from "@/api/Course";
 import * as FeedBack from "@/api/feedback";
+import * as LOG from "@/api/log";
 // 声明接收父组件传递的属性
 const props = defineProps({
   id: {
@@ -162,13 +179,17 @@ const state = reactive({
   select: {},
   data: JSON.parse(props.data),
   content: "",
+  row: {},
   resDialogVisible: false,
-  url:'about:blank',
+  url: "about:blank",
+  type: "",
+  startTime: "",
+  endTime: "",
+  userId:20,
 });
 const dialogVisible = ref(false);
 const data = ref(JSON.parse(props.data));
 const form = ref(null);
-
 
 const seeFeedback = async () => {
   if (state.select.sid == undefined) {
@@ -180,14 +201,13 @@ const seeFeedback = async () => {
   }
   var params = {
     sessionId: state.select.sid,
-    type:"节点",
+    type: "节点",
   };
   const res = await FeedBack.getList(params);
   if (res.rspCode == "200") {
-    
     state.form = res.data;
-    state.form.forEach(element => {
-      element.time=transDate(element.time)
+    state.form.forEach((element) => {
+      element.time = transDate(element.time);
     });
     dialogVisible.value = true;
   } else {
@@ -198,23 +218,23 @@ const seeFeedback = async () => {
   }
 };
 const transDate = (obj) => {
-      const dateTime = new Date(obj);
-      const year = dateTime.getFullYear();
-      const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
-      const day = ("0" + dateTime.getDate()).slice(-2);
-      const hour = ("0" + dateTime.getHours()).slice(-2);
-      const minute = ("0" + dateTime.getMinutes()).slice(-2);
-      const second = ("0" + dateTime.getSeconds()).slice(-2);
-      const formattedDateTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-      return formattedDateTime;
-    };
-const sendFeedBack=async ()=>{
-  console.log('data',data.value.teacherId);
-  var params={
-    "sid":state.select.sid,
-    "content":state.content,
-    "userToId":data.value.teacherId,
-    "userFromId":19,
+  const dateTime = new Date(obj);
+  const year = dateTime.getFullYear();
+  const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
+  const day = ("0" + dateTime.getDate()).slice(-2);
+  const hour = ("0" + dateTime.getHours()).slice(-2);
+  const minute = ("0" + dateTime.getMinutes()).slice(-2);
+  const second = ("0" + dateTime.getSeconds()).slice(-2);
+  const formattedDateTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  return formattedDateTime;
+};
+const sendFeedBack = async () => {
+  console.log("data", data.value.teacherId);
+  var params = {
+    sid: state.select.sid,
+    content: state.content,
+    userToId: data.value.teacherId,
+    userFromId: 19,
   };
   const res = await FeedBack.add(params);
   if (res.rspCode === "200") {
@@ -230,14 +250,13 @@ const sendFeedBack=async ()=>{
       type: "error",
     });
   }
-
-}
-const reloadForm=async ()=>{
+};
+const reloadForm = async () => {
   const res = await FeedBack.getList({ id: state.select.sid });
   if (res.rspCode == "200") {
     state.form = res.data;
-    state.form.forEach(element => {
-      element.time=transDate(element.time)
+    state.form.forEach((element) => {
+      element.time = transDate(element.time);
     });
   } else {
     instance.proxy.$message({
@@ -245,13 +264,104 @@ const reloadForm=async ()=>{
       type: "error",
     });
   }
-}
-const seeResource=(url)=>{
-  if(url!==null){
-    state.url=url;
+};
+const seeResource = (row) => {
+  state.row = row;
+  const url = row.url;
+  if (url !== null) {
+    state.url = url;
   }
-  state.resDialogVisible=true;
-}
+
+  const type = state.url.split(".")[state.url.split(".").length - 1];
+  if (type === "mp4" || type === "avi") {
+    //如果资源是视频,则监控进入页面到退出页面的时间
+    state.type = "vedio";
+  } else if (type === "jpg") {
+    //如果资源是图片,则监控进入页面到退出页面的时间
+    state.type = "image";
+  } else if (type === "mp3") {
+    //如果资源是音频,则记录推出页面时资源的进度条
+    state.type = "mp3";
+  }
+  state.resDialogVisible = true;
+  state.startTime = new Date().getTime();
+};
+const dialogBeforeClose = () => {
+  if (state.type == "vedio") {
+    // 关闭对话框之前，先暂停视频播放
+    const videoElement = document.getElementById("videoElement");
+    console.log("videoElement", videoElement);
+    videoElement.pause();
+
+    const endTime = new Date().getTime();
+    const videoDuration = Math.round(videoElement.duration);
+    const playedTime = Math.round(videoElement.currentTime);
+    const playedPercentage = Math.round((playedTime / videoDuration) * 100);
+
+    // 上报数据到服务器
+    var data = {
+      resourceType: "video",
+      url: state.url,
+      playedPercentage: playedPercentage,
+      playedTime: playedTime,
+      totalTime: videoDuration,
+      startTime: state.startTime,
+      endTime: endTime,
+      fileInfo: state.row,
+      userId:state.userId,
+    };
+    LOG.add(JSON.stringify(data))
+      .then((res) => {
+        console.log("res", res);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+  } else if (state.type == "image") {
+    const endTime = new Date().getTime();
+    const data = {
+      resourceType: "image",
+      url: state.url,
+      startTime: state.startTime,
+      endTime: endTime,
+      fileInfo: state.row,
+      userId:state.userId,
+    };
+    LOG.add(JSON.stringify(data))
+      .then((res) => {
+        console.log("res", res);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+  } else if (state.type == "mp3") {
+    const audioElement = document.getElementById("audioElement");
+    const endTime = new Date().getTime();
+    const audioDuration = Math.round(audioElement.duration);
+    const playedTime = Math.round(audioElement.currentTime);
+    const playedPercentage = Math.round((playedTime / audioDuration) * 100);
+
+    // 上报数据到服务器
+    const data = {
+      resourceType: "mp3",
+      url: state.url,
+      playedPercentage: playedPercentage,
+      playedTime: playedTime,
+      totalTime: audioDuration,
+      startTime: state.startTime,
+      endTime: endTime,
+      fileInfo: state.row,
+      userId:state.userId,
+    };
+    LOG.add(JSON.stringify(data))
+      .then((res) => {
+        console.log("res", res);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+  }
+};
 
 onMounted(async () => {
   //获取iframe
@@ -262,7 +372,7 @@ onMounted(async () => {
     G: "#5BD8A6",
     DI: "#A7A7A7",
   };
-  console.log(state.data);
+  // console.log(state.data);
   const res = await API.getDetail({ id: props.id });
   if (res.rspCode == "200") {
     state.data = res.data;
@@ -740,7 +850,6 @@ onMounted(async () => {
     state.graph = graph;
   };
   initGraph(data);
-  
 });
 </script>
 
@@ -755,10 +864,9 @@ onMounted(async () => {
   padding: 4px;
 }
 .myIframe {
-
   height: 500px;
   /* 自适应缩放 */
-  width: 300px;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
   border: none;
