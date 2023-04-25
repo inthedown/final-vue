@@ -12,9 +12,10 @@ const service = axios.create({
 // 拦截请求
 service.interceptors.request.use(
   config => {
+
     const { authorization } = store.state.app
     if (authorization) {
-      config.headers.Authorization = `Bearer ${authorization.token}`
+      config.headers.Authorization = `${authorization.token}`
     }
     return config
   },
@@ -63,7 +64,7 @@ service.interceptors.response.use(
           url: '/api/authorizations',
           timeout: 10000,
           headers: {
-            Authorization: `Bearer ${authorization.refresh_token}`,
+            Authorization: `${authorization.refresh_token}`,
           },
         })
         // 如果获取成功，则把新的 token 更新到容器中

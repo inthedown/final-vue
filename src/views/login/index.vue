@@ -116,32 +116,11 @@ export default defineComponent({
             ).key;
             model.userName = encryptNoKey(model.userName);
             model.password = encryptNoKey(model.password);
-            // const { code, data, message } = await Login(  model, {headers: {from: 'web'}})
-            // if (+code === 200) {
-            //   ctx.$message.success({
-            //     message: '登录成功',
-            //     duration: 1000,
-            //   })
-            //   const targetPath = decodeURIComponent(route.query.redirect)
-            //   if (targetPath.startsWith('http')) {
-            //     // 如果是一个url地址
-            //     window.location.href = targetPath
-            //   } else if (targetPath.startsWith('/')) {
-            //     // 如果是内部路由地址
-            //     router.push(targetPath)
-            //   } else {
-            //     router.push('/')
-            //   }
-            //   state.loading = false
-            //   store.dispatch('app/setToken', data)
-            // } else {
-            //   ctx.$message.error(message)
-            //   state.loading = false
-            // }
+            
             Login(model, { headers: { from: "web" } })
               .then((response) => {
-                const { code, data, message } = response;
-                if (+code === 200) {
+                const { rspCode, data, message } = response;
+                if (rspCode === '200') {
                   ctx.$message.success({
                     message: "登录成功",
                     duration: 1000,

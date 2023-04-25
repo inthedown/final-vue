@@ -34,9 +34,11 @@
 import * as course from "@/api/Course"
 import { reactive, toRefs ,getCurrentInstance} from 'vue'
 import card from './card.vue'
+import { useUserinfo } from '@/components/Avatar/hooks/useUserinfo'
 export default {
   components: {card},
   setup() {
+    const { userInfo } = useUserinfo()
     const instance = getCurrentInstance()
     const state = reactive({
       items: [
@@ -49,14 +51,13 @@ export default {
     }
     return {
       ...toRefs(state),
-      addCourse
+      addCourse,
+      userInfo
     }
   },
   mounted(){
-    var userInfo={
-      "id":19,"role":'student'
-    }
-    course.getList(userInfo).then(res=>{
+    const { proxy } = getCurrentInstance()
+    course.getList(proxy.userInfo).then(res=>{
       //将数据赋值给items
       this.items=res.data
     })

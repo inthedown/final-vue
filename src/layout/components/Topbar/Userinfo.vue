@@ -5,11 +5,13 @@
     <div class="userinfo">
       <template v-if="!userinfo">
         <i class="el-icon-user" />
-        admin
+        {{ userInfo.name }}
       </template>
       <template v-else>
-        <img class="avatar" :src="userinfo.avatar" />
-        {{ userinfo.name }}
+        <img v-if="userInfo.role==1" class="avatar" :src="state.adminUrl" />
+         <img v-else-if="userInfo.role==2"  class="avatar" :src="state.stuUrl" />
+          <img v-else-if="userInfo.role==3"  class="avatar" :src="state.teaUrl" />
+        
       </template>
     </div>
     <template #dropdown>
@@ -36,8 +38,12 @@ export default defineComponent({
   setup() {
     const store = useStore()
     const router = useRouter()
-
-    const { userinfo } = useUserinfo()
+    const state=reactive({
+      adminUrl:require('@/assets/admin.png'),
+      stuUrl:require('@/assets/stu.png'),
+      teaUrl:require('@/assets/tea.png')
+    })
+    const { userInfo } = useUserinfo()
 
     // 退出
     const logout = () => {
@@ -47,8 +53,9 @@ export default defineComponent({
     }
 
     return {
-      userinfo,
+      userInfo,
       logout,
+      state
     }
   },
 })
