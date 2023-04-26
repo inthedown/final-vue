@@ -58,8 +58,7 @@ export default {
     }
   },
   mounted() {
-    console.log(JSON.stringify( this.data))
-    console.log(this.data.startTime);
+    
   }
 }
 </script>

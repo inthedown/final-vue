@@ -23,6 +23,7 @@ import {
   onMounted,
 } from 'vue'
 import axios from 'axios'
+import{useStore} from 'vuex'
 import drawMapv2 from './drawMapv2.vue'
 
 const state = reactive({

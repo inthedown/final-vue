@@ -4,14 +4,10 @@
   <el-dropdown trigger="click">
     <div class="userinfo">
       <template v-if="!userinfo">
-        <i class="el-icon-user" />
-        {{ userInfo.name }}
-      </template>
-      <template v-else>
         <img v-if="userInfo.role==1" class="avatar" :src="state.adminUrl" />
          <img v-else-if="userInfo.role==2"  class="avatar" :src="state.stuUrl" />
           <img v-else-if="userInfo.role==3"  class="avatar" :src="state.teaUrl" />
-        
+        {{ userInfo.name }}
       </template>
     </div>
     <template #dropdown>
@@ -25,12 +21,14 @@
   </el-dropdown>
 </template>
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent ,reactive} from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useUserinfo } from '@/components/Avatar/hooks/useUserinfo'
 import LockModal from './LockModal.vue'
-
+import adminUrl from '@/assets/img/admin.png';
+import stuUrl from '@/assets/img/stu.png';
+import teaUrl from '@/assets/img/tea.png';
 export default defineComponent({
   components: {
     LockModal,
@@ -39,9 +37,9 @@ export default defineComponent({
     const store = useStore()
     const router = useRouter()
     const state=reactive({
-      adminUrl:require('@/assets/admin.png'),
-      stuUrl:require('@/assets/stu.png'),
-      teaUrl:require('@/assets/tea.png')
+      adminUrl,
+      stuUrl,
+      teaUrl
     })
     const { userInfo } = useUserinfo()
 

@@ -1,37 +1,4 @@
-/*
- *
- *    ┏┓　　　┏┓
- *  ┏┛┻━━━┛┻┓
- *  ┃　　　　　　　┃
- *  ┃　　　━　　　┃
- *  ┃　＞　　　＜　┃
- *  ┃　　　　　　　┃
- *  ┃...　⌒　...　┃
- *  ┃　　　　　　　┃
- *  ┗━┓　　　┏━┛
- *      ┃　　　┃
- *      ┃　　　┃
- *      ┃　　　┃
- *      ┃　　　┃  神兽保佑
- *      ┃　　　┃  代码无bug
- *      ┃　　　┃
- *      ┃　　　┗━━━┓
- *      ┃　　　　　　　┣┓
- *      ┃　　　　　　　┏┛
- *      ┗┓┓┏━┳┓┏┛
- *        ┃┫┫　┃┫┫
- *        ┗┻┛　┗┻┛
- *
- * @Descripttion:
- * @version:
- * @Date: 2021-04-20 11:06:21
- * @LastEditors: huzhushan@126.com
- * @LastEditTime: 2021-09-29 09:47:46
- * @Author: huzhushan@126.com
- * @HomePage: https://huzhushan.gitee.io/vue3-element-admin
- * @Github: https://github.com/huzhushan/vue3-element-admin
- * @Donate: https://huzhushan.gitee.io/vue3-element-admin/donate/
- */
+
 
 import { ElLoading } from 'element-plus'
 import router, { asyncRoutes } from '@/router'
@@ -46,10 +13,9 @@ const getPageTitle = title => {
   return appTitle
 }
 
-// 白名单，里面是路由对象的name
+// 白名单
 const WhiteList = ['login', 'lock']
 
-// vue-router4的路由守卫不再是通过next放行，而是通过return返回true或false或者一个路由地址
 router.beforeEach(async to => {
   document.title = getPageTitle(!!to.meta && to.meta.title)
 
@@ -81,7 +47,6 @@ router.beforeEach(async to => {
         loadingInstance.close()
         return false
       }
-
       // 删除所有动态路由
       asyncRoutes.forEach(item => {
         router.removeRoute(item.name)
@@ -105,19 +70,7 @@ router.beforeEach(async to => {
         return false
       }
     }
-
-    // 判断是否处于锁屏状态
-    if (to.name !== 'lock') {
-      const { authorization } = store.state.app
-      if (!!authorization && !!authorization.screenCode) {
-        return {
-          name: 'lock',
-          query: {
-            redirect: to.path,
-          },
-          replace: true,
-        }
-      }
-    }
+    
+  
   }
 })

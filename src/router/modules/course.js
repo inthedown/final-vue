@@ -38,6 +38,7 @@ export default [
           title: '课程详情',
           affix:false,
         },
+        hidden:true
       },
     ],
   },

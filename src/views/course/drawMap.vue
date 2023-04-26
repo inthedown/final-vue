@@ -21,7 +21,7 @@
         <el-tag size="small">{{ data.teacherName }}</el-tag>
       </el-descriptions-item>
       <el-descriptions-item label="分数占比"
-        >江苏省苏州市吴中区吴中大道 1188 号</el-descriptions-item
+        >视频 0.4 音频 0.3 图片 0.3</el-descriptions-item
       >
     </el-descriptions>
     <div id="container"></div>
@@ -158,6 +158,7 @@ import G6 from "@antv/g6";
 import axios from "axios";
 import * as API from "@/api/Course";
 import * as FeedBack from "@/api/feedback";
+import { useUserinfo } from '@/components/Avatar/hooks/useUserinfo'
 import * as LOG from "@/api/log";
 // 声明接收父组件传递的属性
 const props = defineProps({
@@ -170,6 +171,7 @@ const props = defineProps({
     required: true,
   },
 });
+const { userInfo } = useUserinfo();
 const instance = getCurrentInstance();
 const state = reactive({
   graph: null,
@@ -185,7 +187,7 @@ const state = reactive({
   type: "",
   startTime: "",
   endTime: "",
-  userId:20,
+  userId:userInfo.value.id,
 });
 const dialogVisible = ref(false);
 const data = ref(JSON.parse(props.data));
@@ -229,12 +231,12 @@ const transDate = (obj) => {
   return formattedDateTime;
 };
 const sendFeedBack = async () => {
-  console.log("data", data.value.teacherId);
+  console.log("userInfo", userInfo);
   var params = {
     sid: state.select.sid,
     content: state.content,
     userToId: data.value.teacherId,
-    userFromId: 19,
+    userFromId: state.userId,
   };
   const res = await FeedBack.add(params);
   if (res.rspCode === "200") {
@@ -242,6 +244,7 @@ const sendFeedBack = async () => {
       message: "发送成功",
       type: "success",
     });
+    state.content='';
     reloadForm();
   } else {
     alert(res.errMsg);
@@ -252,7 +255,7 @@ const sendFeedBack = async () => {
   }
 };
 const reloadForm = async () => {
-  const res = await FeedBack.getList({ id: state.select.sid });
+  const res = await FeedBack.getList({ sessionId: state.select.sid,type:'节点' });
   if (res.rspCode == "200") {
     state.form = res.data;
     state.form.forEach((element) => {
@@ -286,7 +289,20 @@ const seeResource = (row) => {
   state.resDialogVisible = true;
   state.startTime = new Date().getTime();
 };
+const reloadGraph=async ()=>{
+   const res = await API.getDetail({ id: props.id });
+  if (res.rspCode == "200") {
+    state.data = res.data;
+  } else {
+    instance.proxy.$message({
+      message: res.errMsg,
+      type: "error",
+    });
+  }
+  state.graph.changeData(state.data);
+}
 const dialogBeforeClose = () => {
+  var data={};
   if (state.type == "vedio") {
     // 关闭对话框之前，先暂停视频播放
     const videoElement = document.getElementById("videoElement");
@@ -299,7 +315,7 @@ const dialogBeforeClose = () => {
     const playedPercentage = Math.round((playedTime / videoDuration) * 100);
 
     // 上报数据到服务器
-    var data = {
+     data = {
       resourceType: "video",
       url: state.url,
       playedPercentage: playedPercentage,
@@ -310,16 +326,10 @@ const dialogBeforeClose = () => {
       fileInfo: state.row,
       userId:state.userId,
     };
-    LOG.add(JSON.stringify(data))
-      .then((res) => {
-        console.log("res", res);
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
+   
   } else if (state.type == "image") {
     const endTime = new Date().getTime();
-    const data = {
+     data = {
       resourceType: "image",
       url: state.url,
       startTime: state.startTime,
@@ -327,13 +337,7 @@ const dialogBeforeClose = () => {
       fileInfo: state.row,
       userId:state.userId,
     };
-    LOG.add(JSON.stringify(data))
-      .then((res) => {
-        console.log("res", res);
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
+   
   } else if (state.type == "mp3") {
     const audioElement = document.getElementById("audioElement");
     const endTime = new Date().getTime();
@@ -342,7 +346,7 @@ const dialogBeforeClose = () => {
     const playedPercentage = Math.round((playedTime / audioDuration) * 100);
 
     // 上报数据到服务器
-    const data = {
+    data = {
       resourceType: "mp3",
       url: state.url,
       playedPercentage: playedPercentage,
@@ -353,15 +357,57 @@ const dialogBeforeClose = () => {
       fileInfo: state.row,
       userId:state.userId,
     };
-    LOG.add(JSON.stringify(data))
+   
+  }
+   LOG.add(JSON.stringify(data))
       .then((res) => {
         console.log("res", res);
       })
       .catch((err) => {
         console.log("err", err);
       });
+      reloadGraph();
+
+};
+const filterNode = (node) => {
+  if(node.length>0){
+    node.forEach((element) => {
+      if (element.children.length > 0) {
+        filterNode(element.children);
+      } else {
+        calculateItemProperties(element);
+      }
+    });
   }
 };
+const calculateItemProperties=(item)=> {
+  var now = new Date();
+  var startDate = new Date(item.date[0]);
+  var endDate = new Date(item.date[1]);
+
+  if (now < startDate) {
+    // 未开始
+    item.label = formatDate(startDate);
+    item.currency = '开始';
+    item.variableName = '未开始';
+  } else if (now > endDate) {
+    // 已结束
+    var days = Math.ceil((now - endDate) / (1000 * 60 * 60 * 24));
+    item.label = days + '天';
+    item.currency = '已结束';
+    item.variableName = '已结束';
+  } else {
+    // 进行中
+    item.label = formatDate(endDate);
+    item.currency = '结束';
+    item.variableName = '进行中';
+  }
+}
+const formatDate=(date)=> {
+  var month = date.getMonth() + 1;
+  var day = date.getDate();
+  return (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
+}
 
 onMounted(async () => {
   //获取iframe
@@ -375,7 +421,10 @@ onMounted(async () => {
   // console.log(state.data);
   const res = await API.getDetail({ id: props.id });
   if (res.rspCode == "200") {
+    // console.log("res.data", res.data);
+    // filterNode(res.data);
     state.data = res.data;
+    console.log("state.data", state.data);
   } else {
     instance.proxy.$message({
       message: res.errMsg,
@@ -850,6 +899,13 @@ onMounted(async () => {
     state.graph = graph;
   };
   initGraph(data);
+    if (typeof window !== 'undefined')
+    window.onresize = () => {
+      if (!state.graph || state.graph.get('destroyed')) return
+      if (!container || !container.scrollWidth || !container.scrollHeight)
+        return
+      state.graph.changeSize(container.scrollWidth, container.scrollHeight)
+    }
 });
 </script>
 

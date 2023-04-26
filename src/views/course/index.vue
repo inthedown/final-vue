@@ -35,6 +35,7 @@ import * as course from "@/api/Course"
 import { reactive, toRefs ,getCurrentInstance} from 'vue'
 import card from './card.vue'
 import { useUserinfo } from '@/components/Avatar/hooks/useUserinfo'
+import { routeLocationKey } from 'vue-router'
 export default {
   components: {card},
   setup() {
@@ -57,7 +58,12 @@ export default {
   },
   mounted(){
     const { proxy } = getCurrentInstance()
-    course.getList(proxy.userInfo).then(res=>{
+
+    const params={
+      id:proxy.userInfo.id,
+      role:proxy.userInfo.role
+    }
+    course.getList(params).then(res=>{
       //将数据赋值给items
       this.items=res.data
     })
