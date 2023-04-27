@@ -39,7 +39,7 @@ Object.values(Directives).forEach(fn => fn(app))
 import useErrorHandler from './error-log'
 useErrorHandler(app)
 
-
+app.config.globalProperties.$echarts = echarts;
 
 
 app
@@ -48,5 +48,4 @@ app
   })
   .use(store)
   .use(router)
-  .mount('#app')
-  .config.globalProperties.$echarts = echarts;
+  .mount('#app');

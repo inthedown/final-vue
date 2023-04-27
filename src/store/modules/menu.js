@@ -19,8 +19,7 @@ const generateUrl = (path, parentPath) => {
 
 const getFilterRoutes = (targetRoutes, ajaxRoutes) => {
   const filterRoutes = []
-  // console.log('targetRoutes',targetRoutes);
-  // console.log( 'ajaxRoutes', ajaxRoutes);
+
   ajaxRoutes.forEach(item => {
     const target = targetRoutes.find(target => target.name === item.name)
 
@@ -88,6 +87,7 @@ export default {
 
         // 生成菜单
         const menus = getFilterMenus([...fixedRoutes, ...filterRoutes])
+
         commit('SET_MENUS', menus)
       }
     },

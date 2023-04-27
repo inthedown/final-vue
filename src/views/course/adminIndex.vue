@@ -144,13 +144,18 @@ export default defineComponent({
       },
       //获取列表
       async getList(params) {
-        const data = await API.getList(params).then((res) => {
+        const { data, total } = await API.getList(params).then((res) => {
           if (res.rspCode == 200) {
             instance.proxy.$message({
               message: "获取列表成功",
               type: "success",
             });
-            return res.data;
+            res.data.content.forEach((item) => {
+              item["startTime"] = transDate(item["startTime"]);
+              item["endTime"] = transDate(item["endTime"]);
+              item["state"] = exState(item);
+            });
+            return { data: res.data.content, total: res.data.totalElements };
           } else {
             instance.proxy.$message({
               message: "获取列表失败",
@@ -159,16 +164,10 @@ export default defineComponent({
             return [];
           }
         });
-        data.forEach((item) => {
-          //2023-04-05T08:00:00.000+00:00转成2023-04-05 08:00:00
-          item["startTime"] =transDate( item["startTime"]);
-          item["endTime"] = transDate(item["endTime"]);
-          item["state"] = exState(item);
-        });
 
         return {
           data: data,
-          total: data.length,
+          total: total,
         };
       },
     });
@@ -211,7 +210,7 @@ export default defineComponent({
       refresh,
       table,
       formLabelWidth,
-      transDate
+      transDate,
     };
   },
 });

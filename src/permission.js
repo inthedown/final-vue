@@ -17,11 +17,13 @@ const getPageTitle = title => {
 const WhiteList = ['login', 'lock']
 
 router.beforeEach(async to => {
+
   document.title = getPageTitle(!!to.meta && to.meta.title)
 
   if (WhiteList.includes(to.name)) {
     return true
   }
+
   if (!window.localStorage[TOKEN]) {
     return {
       name: 'login',
@@ -31,6 +33,7 @@ router.beforeEach(async to => {
       replace: true,
     }
   } else {
+
     // 获取用户角色信息，根据角色判断权限
     let userinfo = store.state.account.userinfo
     if (!userinfo) {
@@ -42,6 +45,7 @@ router.beforeEach(async to => {
       try {
         // 获取用户信息
         userinfo = await store.dispatch('account/getUserinfo')
+
         loadingInstance.close()
       } catch (err) {
         loadingInstance.close()

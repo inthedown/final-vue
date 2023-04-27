@@ -20,6 +20,7 @@ export default {
     // 获取用户信息
     async getUserinfo({ commit }) {
       const { rspCode, data } = await GetUserinfo()
+      console.log('getUserinfo', rspCode, data);
       if (rspCode === '200') {
         commit('setUserinfo', data)
         return Promise.resolve(data)

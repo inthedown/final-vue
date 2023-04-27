@@ -102,7 +102,7 @@ export default defineComponent({
         { label: '角色', prop: 'roleId', width: 80,tdSlot:'roleId' },
         { label: '真实姓名', prop: 'name' },
         { label: '密码', prop: 'password',width:120,tdSlot:'password' },
-        { label: '邮箱', prop: 'emale' },
+        { label: '邮箱', prop: 'email' },
         {label:'年级',prop:'grade'},
         { label: '更新时间', prop: 'createTime', width: 160 },
         {label:'信息',prop:'info'},
@@ -154,7 +154,7 @@ export default defineComponent({
         layout: 'total, prev, pager, next, sizes', // 分页组件显示哪些功能
         pageSize: 10, // 每页条数
         pageSizes: [10, 20, 30, 40],
-        style: { textAlign: 'left' },
+        style: { textAlign: 'center' },
       },
       selectedItems: [],
       batchDelete() {
@@ -211,13 +211,16 @@ export default defineComponent({
       },
       //获取列表
       async getList(params) {
-        const data=await API.getList(params).then((res) => {
+        const {list,total}=  await API.getList(params).then((res) => {
           if (res.rspCode == 200) {
             instance.proxy.$message({
               message: '获取列表成功',
               type: 'success',
             })
-            return res.data;
+            return {
+              list: res.data.list,
+              total: res.data.total,
+            };
           } else {
             instance.proxy.$message({
               message: '获取列表失败',
@@ -226,12 +229,9 @@ export default defineComponent({
             return [];
           }
         })
-        data.forEach((item) => {
-          item.createTime = new Date(item.createTime).toLocaleString()
-        })
-        return {
-          data: data,
-          total: data.length
+         return {
+          data: list,
+          total: total,
         }
       },
       roleList: [
@@ -254,16 +254,14 @@ export default defineComponent({
       table.value.refresh()
     }
     const seePwd = async(row) => {
-      console.log( row);
       
       await API.seePwd(row).then((res) => {
-        if (res.rspCode == 200) {
+        if (res.rspCode == '200') {
           instance.proxy.$message({
-            message: '获取密码成功',
+            message: '获取密码成功,'+res.data,
             type: 'success',
           })
-          console.dir(  table);
-          table.row.password=res.data;
+    
         
         } else {
           instance.proxy.$message({

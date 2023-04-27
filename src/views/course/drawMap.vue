@@ -418,11 +418,8 @@ onMounted(async () => {
     G: "#5BD8A6",
     DI: "#A7A7A7",
   };
-  // console.log(state.data);
   const res = await API.getDetail({ id: props.id });
   if (res.rspCode == "200") {
-    // console.log("res.data", res.data);
-    // filterNode(res.data);
     state.data = res.data;
     console.log("state.data", state.data);
   } else {
@@ -518,7 +515,6 @@ onMounted(async () => {
             rate,
           } = cfg;
           const grey = "#CED4D9";
-          // 逻辑不应该在这里判断
           const rectConfig = {
             width: 202,
             height: 60,
