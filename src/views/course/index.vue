@@ -35,7 +35,7 @@ import * as course from "@/api/Course"
 import { reactive, toRefs ,getCurrentInstance} from 'vue'
 import card from './card.vue'
 import { useUserinfo } from '@/components/Avatar/hooks/useUserinfo'
-import { routeLocationKey } from 'vue-router'
+
 export default {
   components: {card},
   setup() {
@@ -50,10 +50,27 @@ export default {
       //跳转到增加课程页面
       instance.proxy.$router.push({path:'/add'})
     }
+    const formatDate=(date)=>{
+    //格式化时间yyyy-mm-dd hh:mm:ss
+      var year=date.getFullYear()
+      var month=date.getMonth()+1
+      var day=date.getDate()
+      var hour=date.getHours()
+      var minute=date.getMinutes()
+      var second=date.getSeconds()
+      //不足两位补0
+      month=month<10?'0'+month:month
+      day=day<10?'0'+day:day
+      hour=hour<10?'0'+hour:hour
+      minute=minute<10?'0'+minute:minute
+      second=second<10?'0'+second:second
+      return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second
+    }
     return {
       ...toRefs(state),
       addCourse,
-      userInfo
+      userInfo,
+      formatDate
     }
   },
   mounted(){
@@ -65,7 +82,14 @@ export default {
     }
     course.getList(params).then(res=>{
       //将数据赋值给items
-      this.items=res.data
+      var data=res.data.content
+  
+      for(var i=0;i<data.length;i++){
+        data[i].startTime=proxy.formatDate(new Date(data[i].startTime))
+        data[i].endTime=proxy.formatDate(new Date(data[i].endTime))
+      }
+      console.log(data);
+      this.items=data
     })
   }
 }

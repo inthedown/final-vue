@@ -291,7 +291,7 @@ const seeResource = (row) => {
 };
 const reloadGraph=async ()=>{
    const res = await API.getDetail({ id: props.id });
-  if (res.rspCode == "200") {
+  if (res.rspCode === '200') {
     state.data = res.data;
   } else {
     instance.proxy.$message({
@@ -421,7 +421,7 @@ onMounted(async () => {
   const res = await API.getDetail({ id: props.id });
   if (res.rspCode == "200") {
     state.data = res.data;
-    console.log("state.data", state.data);
+    // console.log("state.data", state.data);
   } else {
     instance.proxy.$message({
       message: res.errMsg,
@@ -430,7 +430,7 @@ onMounted(async () => {
   }
   //  组件props
   const props1 = {
-    data: res.data[0],
+    data:state.data,
     config: {
       padding: [10, 10],
       defaultLevel: 3,
@@ -857,6 +857,11 @@ onMounted(async () => {
     }
 
     graph.zoom(config.defaultZoom || 1);
+const getParentId=(childId)=> {
+  var arr = childId.split('-'); // 将子节点id按照"-"进行分割，存入数组中
+  arr.pop(); // 删除数组中的最后一个元素，即子节点的编号
+  return arr.join('-'); // 将数组中剩余的元素拼接成父节点id并返回
+}
 
     const handleCollapse = (e) => {
       const target = e.target;
@@ -879,6 +884,29 @@ onMounted(async () => {
       const targetType = target.get("type");
       const name = target.get("name");
 
+      //判断父节点
+      const id = item.get("id");
+      const parentId = getParentId(id);
+      const parentItem = graph.findById(parentId);
+      if(parentItem){
+        const parentModel = parentItem.getModel();
+        if(parentModel.variableName!=='已完成'||parentModel.variableName!=='进行中'){
+         instance.proxy.$message({
+            message: "请先完成父节点",
+            type: "error",
+          });
+          return;
+        }
+      }
+      if(item){
+        if(item.getModel().currency==='未开始'||item.getModel().currency==='已结束'){
+          instance.proxy.$message({
+            message: "已超过期限",
+            type: "error",
+          });
+          return;
+        }
+      }
       // 增加元素
       if (targetType === "marker") {
         const model = item.getModel();

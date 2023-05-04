@@ -1,9 +1,10 @@
 <template>
    <el-card >
-      <!-- <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image"> -->
+      
       <div style="padding: 14px;">
+        <img src="src\assets\img\course.png" class="image">
         <span>{{data.courseName}}</span>
-        <span>{{data.teacherName}}</span>
+        <span style="margin-left:10px;">{{data.teacherName}}</span>
         <div class="bottom clearfix">
          开始时间<span class="time">{{ data.startTime }}</span>结束时间<span class="time">{{ data.endTime }}</span>
           <el-button type="text" class="button" @click="find">查看</el-button>
@@ -29,32 +30,13 @@ export default {
 
     })
     const find = () => {
-      state.data.startTime=transDate(state.data.startTime)
-      state.data.endTime=transDate(state.data.endTime)
-
-       instance.proxy.$router.push({ path: '/detail', query: { id: state.data.id,data:JSON.stringify(state.data)} })
+      instance.proxy.$router.push({ path: '/detail', query: { id: state.data.id,data:JSON.stringify(state.data)} })
     }
-     const transDate = (obj) => {
-      // 创建一个日期对象，传入要转换的日期时间字符串作为参数
-      const dateTime = new Date(obj);
-
-      // 使用日期对象的方法获取年、月、日、小时、分钟和秒数
-      const year = dateTime.getFullYear();
-      const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
-      const day = ("0" + dateTime.getDate()).slice(-2);
-      const hour = ("0" + dateTime.getHours()).slice(-2);
-      const minute = ("0" + dateTime.getMinutes()).slice(-2);
-      const second = ("0" + dateTime.getSeconds()).slice(-2);
-
-      // 将年、月、日、小时、分钟和秒数组合成所需的格式
-      const formattedDateTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-
-      return formattedDateTime;
-    };
+ 
     return {
       ...toRefs(state),
       find,
-      transDate,
+     
     }
   },
   mounted() {
@@ -67,6 +49,7 @@ export default {
  .time {
     font-size: 13px;
     color: #999;
+    margin: 10px 5px;
   }
   
   .bottom {
@@ -80,8 +63,9 @@ export default {
   }
 
   .image {
-    width: 100%;
-    display: block;
+    width: 30px;
+    height: 30px;
+    
   }
 
   .clearfix:before,
