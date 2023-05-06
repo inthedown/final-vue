@@ -2,7 +2,7 @@
    <el-card >
       
       <div style="padding: 14px;">
-        <img src="src\assets\img\course.png" class="image">
+        <img src="~@/assets/img/course.png" class="image">
         <span>{{data.courseName}}</span>
         <span style="margin-left:10px;">{{data.teacherName}}</span>
         <div class="bottom clearfix">

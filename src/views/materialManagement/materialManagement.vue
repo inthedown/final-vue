@@ -162,7 +162,7 @@
           <ul id="nav">
             <li v-for="(item, i) in itemlist" v-bind:key="i">
               <input type="radio" name="select" id="select" />
-              <img src="src\assets\img\folder.png" alt="" />
+              <img src="~@/assets/img/folder.png" alt="" />
               <span>{{ item.name }}</span>
             </li>
           </ul>
