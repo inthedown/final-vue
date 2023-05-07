@@ -59,7 +59,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="percentage" label="进度"
-              ><template slot-scope="scope">
+              ><template #title="scope">
                 <i class="el-icon-time"></i>
                 <span style="margin-left: 10px">{{ scope }}</span>
               </template>
@@ -108,7 +108,7 @@
         </el-form-item>
       </el-form>
 
-      <div slot="footer" style="text-align: center">
+      <div style="text-align: center">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="sendFeedBack">发送</el-button>
       </div>
@@ -138,7 +138,7 @@
         <img src="@/assets/img/fileWarn.png" alt="" />
       </div>
 
-      <div slot="footer" style="text-align: center">
+      <div  style="text-align: center">
         <el-button @click="state.resDialogVisible = false">关闭</el-button>
       </div>
     </el-dialog>
@@ -220,6 +220,7 @@ const seeFeedback = async () => {
   }
 };
 const transDate = (obj) => {
+
   const dateTime = new Date(obj);
   const year = dateTime.getFullYear();
   const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
@@ -276,14 +277,15 @@ const seeResource = (row) => {
   }
 
   const type = state.url.split(".")[state.url.split(".").length - 1];
+  console.log("type", type);
   if (type === "mp4" || type === "avi") {
-    //如果资源是视频,则监控进入页面到退出页面的时间
+ 
     state.type = "vedio";
-  } else if (type === "jpg") {
-    //如果资源是图片,则监控进入页面到退出页面的时间
+  } else if (type === "jpg"||type === "png"||type === "jpeg") {
+
     state.type = "image";
-  } else if (type === "mp3") {
-    //如果资源是音频,则记录推出页面时资源的进度条
+  } else if (type === "mp3"||type === "wav"||type === "wma"||type === "m4a") {
+  
     state.type = "mp3";
   }
   state.resDialogVisible = true;

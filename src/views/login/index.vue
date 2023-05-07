@@ -3,7 +3,7 @@
     <el-form class="form" :model="model" :rules="rules" ref="loginForm">
       <h3>Hello!</h3>
       <h2>欢迎登陆</h2>
-      <h1 class="title">BOE画屏发布系统</h1>
+      <h1 class="title">在线教育平台</h1>
       <el-form-item prop="userName">
         <el-input
           class="text"
@@ -42,11 +42,17 @@
         </el-button>
       </el-form-item>
     </el-form>
-  </div>
-  <div class="zuo">
-    <img src="/src/assets/img/denglu.png" class="fengmian" />
-    <div class="bottom">"Copyright © 2022 臭华子团队 版权所有"</div>
-  </div>
+        </div>
+    <div class="zuo">
+    <img src="~@\assets\img\鸢尾.svg" class="fengmian">
+    <div class="bottom">
+      "Copyright © 
+      31901050 饶黎明 版权所有"
+    </div>
+    </div>
+    
+ 
+  
 </template>
 
 <script>
@@ -227,7 +233,7 @@ export default defineComponent({
 
   .bottom {
     font-size: 15px;
-    bottom: 2rem;
+    bottom: -23rem;
     color: #5e6875;
     position: relative;
     margin-left: 700px;

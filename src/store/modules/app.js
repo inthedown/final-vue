@@ -8,7 +8,7 @@ const COLLAPSE = 'VEA-COLLAPSE'
 export default {
   namespaced: true,
   state: {
-    title: '画屏发布系统',
+    title: '在线教育平台',
     authorization: getItem(TOKEN),
     sidebar: {
       collapse: getItem(COLLAPSE),
