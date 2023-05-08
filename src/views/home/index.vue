@@ -3,32 +3,33 @@
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
     <shortcuts />
     <el-row>
-      <el-col :xs="24" :sm="24" :lg="14">
+      <el-col :xs="24" :sm="24" :lg="24">
         <div class="chart-wrapper">
           <div class="head-title">课程完成状态</div>
           <shebei-chart />
         </div>
       </el-col>
 
-      <el-col :xs="24" :sm="24" :lg="10">
-        <div class="chart-wrapper">
+     
+    </el-row>
+
+    <el-row>
+       <el-col :xs="24" :sm="24" :lg="10">
+        <div class="form-wrapper">
           <div class="head-title">学生访问记录</div>
           <eq-dis />
         </div>
       </el-col>
-    </el-row>
-
-    <el-row>
       <el-col :xs="24" :sm="24" :lg="14">
         <div class="form-wrapper">
           <reminder />
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :lg="10">
+      <!-- <el-col :xs="24" :sm="24" :lg="10">
         <div class="form-wrapper1">
           <event-record />
         </div>
-      </el-col>
+      </el-col> -->
     </el-row>
   </div>
 </template>
@@ -98,9 +99,6 @@ export default {
   mounted(){
     VISUAL.getStatus().then((res) => {
       console.log('getStatus',res);
-    });
-    VISUAL.getMap().then((res) => {
-      console.log('getMap',res);
     });
   }
 };

@@ -152,8 +152,8 @@ export default defineComponent({
           }
         });
         return {
-          data: data,
-          total: data.length,
+          data: data.list,
+          total: data.total,
         };
       },
     });

@@ -5,7 +5,7 @@
                 <img src="/src/assets/img/设备.png">
                 <div>
                     <p>开课数量</p>
-                    <span>5</span>
+                    <span>{{courseNum}}</span>
                 </div>
             </div>
         </el-col>
@@ -14,7 +14,7 @@
                 <img src="/src/assets/img/节目.png">
                 <div>
                     <p>反馈数量</p>
-                    <span>33</span>
+                    <span>{{feedbackNum}}</span>
                 </div>
             </div>
         </el-col>
@@ -23,15 +23,41 @@
                 <img src="/src/assets/img/计划.png">
                 <div>
                     <p>学生数量</p>
-                    <span>56</span>
+                    <span>{{studentNum}}</span>
                 </div>
             </div>
         </el-col>
     
     </el-row>
 </template>
+<script>
+import { reactive,toRefs } from 'vue'
+import * as VISUAL from '@/api/visual'
+export default {
+    name: "Shortcuts",
+    setup() {
+        const state = reactive({
+            courseNum: 0,
+            feedbackNum: 0,
+            studentNum: 0,
+        });
+        return {
+            ...toRefs(state),
+        }
+    },
+    mounted() {
+        VISUAL.getMap().then(res => {
+            if(res.rspCode=='200'){
+                this.courseNum=res.data.courseNum;
+                this.feedbackNum=res.data.feedbackNum;
+                this.studentNum=res.data.studentNum;
+            }
+        })
+    },
 
-<!-- <script setup></script> -->
+
+}
+</script>
 
 <style lang="scss" scoped>
 .el-row {

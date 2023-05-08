@@ -176,7 +176,7 @@ const upload = () => {
         calculateItemProperties(node)
         state.graph.updateItem(state.graph.findById(form.id), node)
         state.graph.render()
-        console.log(state.graph.findById(form.id))
+        // console.log(state.graph.findById(form.id))
         state.show = false
       } else {
         instance.proxy.$message({
@@ -740,7 +740,7 @@ onMounted(() => {
           }
           state.show = true
         }
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data));
         instance.proxy.$emit('childClick', data)
       }
     })

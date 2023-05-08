@@ -1,7 +1,7 @@
 <template>
   <el-form label-width="90px" >
     <el-form-item label="课程名称">
-      <el-input v-model="state.name" />
+      <el-input v-model="name" />
     </el-form-item>
     <el-form-item>
       <draw-mapv-2  @childClick="handleChildClick"></draw-mapv-2>
@@ -13,31 +13,33 @@
   </el-form>
 </template>
 
-<script setup>
+<script >
 import {
   reactive,
   toRefs,
-  ref,
-  watch,
   getCurrentInstance,
-  onMounted,
 } from 'vue'
-import axios from 'axios'
-import{useStore} from 'vuex'
-import drawMapv2 from './drawMapv2.vue'
 
+import drawMapv2 from './drawMapv2.vue'
+import { useUserinfo } from "@/components/Avatar/hooks/useUserinfo";
+import * as COURSE from '@/api/Course'
+
+export default {
+  components: { drawMapv2 },
+  setup() {
+    const {userInfo} = useUserinfo()
 const state = reactive({
   name: '',
   classes: '',
-  teacherId: '23',
+  teacherId: userInfo.value.id,
   data: [],
 })
 
 const instance = getCurrentInstance()
 const handleChildClick = param => {
-  console.log('接收到子组件传递的参数：', param)
-  console.log('接收到子组件传递的参数：',param.date)
-  console.log('接收到子组件传递的参数：',JSON.stringify(param.date))
+  // console.log('接收到子组件传递的参数：', param)
+  // console.log('接收到子组件传递的参数：',param.date)
+  // console.log('接收到子组件传递的参数：',JSON.stringify(param.date))
   state.data = param
 }
 
@@ -76,21 +78,19 @@ const filterObject=(obj)=> {
   }
 
 const submit = () => {
-  
   if (state.data.length === 0) {
     instance.proxy.$message({
       message: '请添加课程章节',
       type: 'error',
     })
   } else {
-    console.log(state.data);
     const data = {
       name: state.name,
       teacherId: state.teacherId,
       data:filterObject( state.data),
     }
-    axios.post('/api/course/add', data).then(res => {
-      if (res.data.rspCode === '200') {
+     COURSE.add(data).then(res => {
+      if (res.rspCode === '200') {
         instance.proxy.$message({
           message: '课程创建成功',
           type: 'success',
@@ -98,17 +98,29 @@ const submit = () => {
         instance.proxy.$router.push('/course')
       } else {
         instance.proxy.$message({
-          message: res.errMsg,
+          message: res.rspMsg,
           type: 'error',
         })
       }
     })
   }
+  }
+  return {
+    ...toRefs(state),
+    handleChildClick,
+    submit,
+    userInfo,
+    filterObject,
+    instance,
+  }
+  },
+  mounted() {
+    
+  },
 }
-onMounted(() => {
-
-})
 </script>
+
+
 
 <style scoped>
 

@@ -4,7 +4,6 @@
 
 <script>
 import { reactive, toRefs, getCurrentInstance, ref, onMounted } from "vue";
-import * as echarts from "echarts";
 import { Chart } from "@antv/g2";
 import * as VISUAL from "@/api/visual";
 export default {

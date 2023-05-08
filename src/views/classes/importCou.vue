@@ -127,7 +127,7 @@ export default defineComponent({
               type: "success",
             });
             //startTime endTime格式化
-            res.data.forEach((item) => {
+            res.data.content.forEach((item) => {
               item.startTime = item.startTime.substring(0, 10);
               item.endTime = item.endTime.substring(0, 10);
             });
@@ -141,8 +141,8 @@ export default defineComponent({
           }
         });
         return {
-          data: data,
-          total: data.length,
+          data: data.content,
+          total: data.totalElements,
         };
       },
     });

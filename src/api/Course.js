@@ -10,7 +10,7 @@ export const add = data => {
     return request({
       url: '/api/course/add',
       method: 'post',
-      params: data,
+      data: data,
     })
 }
 export const deleteCourse = data => {

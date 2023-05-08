@@ -27,6 +27,7 @@
     <div id="container"></div>
     <el-form
       style="
+        width: 100%;
         margin-top: 10px;
         background-color: rgb(255, 255, 255);
         padding: 10px 5px;
@@ -42,7 +43,7 @@
           >反馈</el-button
         >
       </el-form-item>
-      <el-form-item label="资源列表">
+      <el-form-item label="资源列表" style="width: 100%">
         <div style="width: 100%">
           <el-table :data="state.resourceList" style="width: 100%">
             <el-table-column prop="name" label="名称" key="slot">
@@ -138,7 +139,7 @@
         <img src="@/assets/img/fileWarn.png" alt="" />
       </div>
 
-      <div  style="text-align: center">
+      <div style="text-align: center">
         <el-button @click="state.resDialogVisible = false">关闭</el-button>
       </div>
     </el-dialog>
@@ -158,7 +159,7 @@ import G6 from "@antv/g6";
 import axios from "axios";
 import * as API from "@/api/Course";
 import * as FeedBack from "@/api/feedback";
-import { useUserinfo } from '@/components/Avatar/hooks/useUserinfo'
+import { useUserinfo } from "@/components/Avatar/hooks/useUserinfo";
 import * as LOG from "@/api/log";
 // 声明接收父组件传递的属性
 const props = defineProps({
@@ -187,7 +188,7 @@ const state = reactive({
   type: "",
   startTime: "",
   endTime: "",
-  userId:userInfo.value.id,
+  userId: userInfo.value.id,
 });
 const dialogVisible = ref(false);
 const data = ref(JSON.parse(props.data));
@@ -220,7 +221,6 @@ const seeFeedback = async () => {
   }
 };
 const transDate = (obj) => {
-
   const dateTime = new Date(obj);
   const year = dateTime.getFullYear();
   const month = ("0" + (dateTime.getMonth() + 1)).slice(-2);
@@ -232,7 +232,20 @@ const transDate = (obj) => {
   return formattedDateTime;
 };
 const sendFeedBack = async () => {
-  console.log("userInfo", userInfo);
+  if (state.select.sid == undefined) {
+    instance.proxy.$message({
+      message: "请选择反馈节点",
+      type: "error",
+    });
+    return;
+  }
+  if (state.content == "") {
+    instance.proxy.$message({
+      message: "请输入反馈内容",
+      type: "error",
+    });
+    return;
+  }
   var params = {
     sid: state.select.sid,
     content: state.content,
@@ -245,7 +258,7 @@ const sendFeedBack = async () => {
       message: "发送成功",
       type: "success",
     });
-    state.content='';
+    state.content = "";
     reloadForm();
   } else {
     alert(res.errMsg);
@@ -256,7 +269,10 @@ const sendFeedBack = async () => {
   }
 };
 const reloadForm = async () => {
-  const res = await FeedBack.getList({ sessionId: state.select.sid,type:'节点' });
+  const res = await FeedBack.getList({
+    sessionId: state.select.sid,
+    type: "节点",
+  });
   if (res.rspCode == "200") {
     state.form = res.data;
     state.form.forEach((element) => {
@@ -279,21 +295,23 @@ const seeResource = (row) => {
   const type = state.url.split(".")[state.url.split(".").length - 1];
   console.log("type", type);
   if (type === "mp4" || type === "avi") {
- 
     state.type = "vedio";
-  } else if (type === "jpg"||type === "png"||type === "jpeg") {
-
+  } else if (type === "jpg" || type === "png" || type === "jpeg") {
     state.type = "image";
-  } else if (type === "mp3"||type === "wav"||type === "wma"||type === "m4a") {
-  
+  } else if (
+    type === "mp3" ||
+    type === "wav" ||
+    type === "wma" ||
+    type === "m4a"
+  ) {
     state.type = "mp3";
   }
   state.resDialogVisible = true;
   state.startTime = new Date().getTime();
 };
-const reloadGraph=async ()=>{
-   const res = await API.getDetail({ id: props.id });
-  if (res.rspCode === '200') {
+const reloadGraph = async () => {
+  const res = await API.getDetail({ id: props.id });
+  if (res.rspCode === "200") {
     state.data = res.data;
   } else {
     instance.proxy.$message({
@@ -302,9 +320,9 @@ const reloadGraph=async ()=>{
     });
   }
   state.graph.changeData(state.data);
-}
+};
 const dialogBeforeClose = () => {
-  var data={};
+  var data = {};
   if (state.type == "vedio") {
     // 关闭对话框之前，先暂停视频播放
     const videoElement = document.getElementById("videoElement");
@@ -317,7 +335,7 @@ const dialogBeforeClose = () => {
     const playedPercentage = Math.round((playedTime / videoDuration) * 100);
 
     // 上报数据到服务器
-     data = {
+    data = {
       resourceType: "video",
       url: state.url,
       playedPercentage: playedPercentage,
@@ -326,20 +344,18 @@ const dialogBeforeClose = () => {
       startTime: state.startTime,
       endTime: endTime,
       fileInfo: state.row,
-      userId:state.userId,
+      userId: state.userId,
     };
-   
   } else if (state.type == "image") {
     const endTime = new Date().getTime();
-     data = {
+    data = {
       resourceType: "image",
       url: state.url,
       startTime: state.startTime,
       endTime: endTime,
       fileInfo: state.row,
-      userId:state.userId,
+      userId: state.userId,
     };
-   
   } else if (state.type == "mp3") {
     const audioElement = document.getElementById("audioElement");
     const endTime = new Date().getTime();
@@ -357,22 +373,20 @@ const dialogBeforeClose = () => {
       startTime: state.startTime,
       endTime: endTime,
       fileInfo: state.row,
-      userId:state.userId,
+      userId: state.userId,
     };
-   
   }
-   LOG.add(JSON.stringify(data))
-      .then((res) => {
-        console.log("res", res);
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
-      reloadGraph();
-
+  LOG.add(JSON.stringify(data))
+    .then((res) => {
+      console.log("res", res);
+    })
+    .catch((err) => {
+      console.log("err", err);
+    });
+  reloadGraph();
 };
 const filterNode = (node) => {
-  if(node.length>0){
+  if (node.length > 0) {
     node.forEach((element) => {
       if (element.children.length > 0) {
         filterNode(element.children);
@@ -382,7 +396,7 @@ const filterNode = (node) => {
     });
   }
 };
-const calculateItemProperties=(item)=> {
+const calculateItemProperties = (item) => {
   var now = new Date();
   var startDate = new Date(item.date[0]);
   var endDate = new Date(item.date[1]);
@@ -390,26 +404,26 @@ const calculateItemProperties=(item)=> {
   if (now < startDate) {
     // 未开始
     item.label = formatDate(startDate);
-    item.currency = '开始';
-    item.variableName = '未开始';
+    item.currency = "开始";
+    item.variableName = "未开始";
   } else if (now > endDate) {
     // 已结束
     var days = Math.ceil((now - endDate) / (1000 * 60 * 60 * 24));
-    item.label = days + '天';
-    item.currency = '已结束';
-    item.variableName = '已结束';
+    item.label = days + "天";
+    item.currency = "已结束";
+    item.variableName = "已结束";
   } else {
     // 进行中
     item.label = formatDate(endDate);
-    item.currency = '结束';
-    item.variableName = '进行中';
+    item.currency = "结束";
+    item.variableName = "进行中";
   }
-}
-const formatDate=(date)=> {
+};
+const formatDate = (date) => {
   var month = date.getMonth() + 1;
   var day = date.getDate();
-  return (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
-}
+  return (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+};
 
 onMounted(async () => {
   //获取iframe
@@ -432,7 +446,7 @@ onMounted(async () => {
   }
   //  组件props
   const props1 = {
-    data:state.data,
+    data: state.data,
     config: {
       padding: [10, 10],
       defaultLevel: 3,
@@ -859,11 +873,11 @@ onMounted(async () => {
     }
 
     graph.zoom(config.defaultZoom || 1);
-const getParentId=(childId)=> {
-  var arr = childId.split('-'); // 将子节点id按照"-"进行分割，存入数组中
-  arr.pop(); // 删除数组中的最后一个元素，即子节点的编号
-  return arr.join('-'); // 将数组中剩余的元素拼接成父节点id并返回
-}
+    const getParentId = (childId) => {
+      var arr = childId.split("-"); // 将子节点id按照"-"进行分割，存入数组中
+      arr.pop(); // 删除数组中的最后一个元素，即子节点的编号
+      return arr.join("-"); // 将数组中剩余的元素拼接成父节点id并返回
+    };
 
     const handleCollapse = (e) => {
       const target = e.target;
@@ -890,18 +904,22 @@ const getParentId=(childId)=> {
       const id = item.get("id");
       const parentId = getParentId(id);
       const parentItem = graph.findById(parentId);
-      if(parentItem){
+      if (parentItem) {
         const parentModel = parentItem.getModel();
-        if(parentModel.variableName!=='已完成'||parentModel.variableName!=='进行中'){
-         instance.proxy.$message({
+        console.log("parentModel.variableName", parentModel.variableName);
+        if (parentModel.variableName == "未开始") {
+          instance.proxy.$message({
             message: "请先完成父节点",
             type: "error",
           });
           return;
         }
       }
-      if(item){
-        if(item.getModel().currency==='未开始'||item.getModel().currency==='已结束'){
+      if (item) {
+        if (
+          item.getModel().currency === "未开始" ||
+          item.getModel().currency === "已结束"
+        ) {
           instance.proxy.$message({
             message: "已超过期限",
             type: "error",
@@ -925,13 +943,14 @@ const getParentId=(childId)=> {
     state.graph = graph;
   };
   initGraph(data);
-    if (typeof window !== 'undefined')
+  if (typeof window !== "undefined")
     window.onresize = () => {
-      if (!state.graph || state.graph.get('destroyed')) return
+      if (!state.graph || state.graph.get("destroyed")) return;
       if (!container || !container.scrollWidth || !container.scrollHeight)
-        return
-      state.graph.changeSize(container.scrollWidth, container.scrollHeight)
-    }
+        return;
+        console.log('container',container.scrollWidth, container.scrollHeight);
+      state.graph.changeSize(container.scrollWidth, 600);
+    };
 });
 </script>
 
@@ -945,12 +964,5 @@ const getParentId=(childId)=> {
   background-color: rgb(231, 208, 208);
   padding: 4px;
 }
-.myIframe {
-  height: 500px;
-  /* 自适应缩放 */
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border: none;
-}
+
 </style>

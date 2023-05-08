@@ -53,6 +53,7 @@ export default env => {
       proxy: {
         '/api': {
           target: 'http://localhost:8080', // 后端接口的域名
+          //target: 'http://116.62.32.208:8080',
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, ''),
         },

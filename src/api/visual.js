@@ -17,3 +17,16 @@ export const getMap =()=> {
       method: 'get',
     })
 }
+export const getBack =()=> {
+  return request({
+    url: '/api/feedback/getBackMsg',
+    method: 'get',
+  })
+}
+export const getCircles =(data)=> {
+  return request({
+    url: '/api/visual/getDonutMap',
+    method: 'get',
+    params:data
+  })
+}

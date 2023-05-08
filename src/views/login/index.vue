@@ -123,7 +123,7 @@ export default defineComponent({
             model.userName = encryptNoKey(model.userName);
             model.password = encryptNoKey(model.password);
             
-            Login(model, { headers: { from: "web" } })
+            Login(model)
               .then((response) => {
                 const { rspCode, data, message } = response;
                 if (rspCode === '200') {
@@ -233,14 +233,13 @@ export default defineComponent({
 
   .bottom {
     font-size: 15px;
-    bottom: -23rem;
     color: #5e6875;
     position: relative;
-    margin-left: 700px;
+    margin-left: 300px;
     width: 100%;
   }
   .fengmian {
-    width: 100%;
+    height: 100%;
   }
 }
 </style>
