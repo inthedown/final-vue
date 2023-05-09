@@ -33,3 +33,10 @@ export const importCou = data => {
     params: data,
   })
 }
+export const update = data => {
+  return request({
+    url: '/api/course/update',
+    method: 'post',
+   data: data,
+  })
+}

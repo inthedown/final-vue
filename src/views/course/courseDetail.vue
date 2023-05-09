@@ -25,15 +25,6 @@ export default {
     const route = useRoute()
     const id = route.query.id
      const instance = getCurrentInstance();
-    // const res=await API.getDetail({"id":id})
-    //   if (res.rspCode == '200') {
-    //     state.data = res.data; 
-    //   } else {
-    //     instance.proxy.$message({
-    //       message: res.errMsg,
-    //       type: "error",
-    //     });
-    //   }
   } )
    return {
       ...toRefs(state),

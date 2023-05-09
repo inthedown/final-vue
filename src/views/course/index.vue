@@ -1,8 +1,7 @@
 <template>
   <el-header>
     <el-row :gutter="20">
-      <el-col :span="6">我的课程</el-col>
-      <el-col :span="6" :offset="10">
+      <el-col :span="6" :offset="18">
         <el-button type="primary" @click="addCourse"> 增加课程 </el-button>
       </el-col>
     </el-row>
@@ -112,6 +111,13 @@ export default {
   flex-wrap: wrap;
   /* 需要指定高度 */
   height: 600px;
+}
+.title {
+  display: flex;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .scrollbar-demo-item {
   /* 瀑布流卡片样式 */

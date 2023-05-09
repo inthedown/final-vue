@@ -189,6 +189,7 @@ const state = reactive({
   startTime: "",
   endTime: "",
   userId: userInfo.value.id,
+  userRole: userInfo.value.role,
 });
 const dialogVisible = ref(false);
 const data = ref(JSON.parse(props.data));

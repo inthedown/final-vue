@@ -115,6 +115,7 @@ export default defineComponent({
             var model = { ...state.model };
             if (!model.role) {
               ctx.$message.error("请选择角色");
+              state.loading = false;
               return;
             }
             model.role = state.roleMap.find(
@@ -150,7 +151,7 @@ export default defineComponent({
               })
               .catch((error) => {
                 console.error(error);
-                ctx.$message.error("登录失败");
+                ctx.$message.error('登录失败');
                 state.loading = false;
               });
           }
