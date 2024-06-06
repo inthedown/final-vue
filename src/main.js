@@ -49,3 +49,6 @@ app
   .use(store)
   .use(router)
   .mount('#app');
+
+
+//main2
